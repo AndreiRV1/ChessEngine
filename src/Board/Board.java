@@ -1,5 +1,6 @@
 package Board;
 
+import Exceptions.InvalidCommandException;
 import Exceptions.InvalidMoveException;
 import Pieces.*;
 
@@ -31,52 +32,40 @@ public class Board {
         }
     }
 
+    public ChessPair<Position, Piece> createPiece(String type, String color, String position) {
+        Position pos = new Position(position);
+        return new ChessPair<>(pos, PieceFactory.factory(type,color,position));
+    }
+
     public void initialize() {
         ChessPair<Position, Piece> chessPair;
         Position position;
         for (int i = 0; i < 8; i++) {
-            position = new Position((char) ((int) 'A' + i), 2);
-            chessPair = new ChessPair(position, new Pawn(Colors.WHITE, position));
-            pieces.add(chessPair);
+            pieces.add(createPiece("P", "white", (char) ('A' + i) + "2"));
         }
-        for (int i = 0; i < 8; i++) {
-            position = new Position((char) ((int) 'A' + i), 7);
-            chessPair = new ChessPair(position, new Pawn(Colors.BLACK, position));
-            pieces.add(chessPair);
-        }
-        position = new Position('A', 1);
-        pieces.add(new ChessPair(position, new Rook(Colors.WHITE, position)));
-        position = new Position('B', 1);
-        pieces.add(new ChessPair(position, new Knight(Colors.WHITE, position)));
-        position = new Position('C', 1);
-        pieces.add(new ChessPair(position, new Bishop(Colors.WHITE, position)));
-        position = new Position('E', 1);
-        pieces.add(new ChessPair(position, new Queen(Colors.WHITE, position)));
-        position = new Position('D', 1);
-        pieces.add(new ChessPair(position, new King(Colors.WHITE, position)));
-        position = new Position('F', 1);
-        pieces.add(new ChessPair(position, new Bishop(Colors.WHITE, position)));
-        position = new Position('G', 1);
-        pieces.add(new ChessPair(position, new Knight(Colors.WHITE, position)));
-        position = new Position('H', 1);
-        pieces.add(new ChessPair(position, new Rook(Colors.WHITE, position)));
 
-        position = new Position('A', 8);
-        pieces.add(new ChessPair(position, new Rook(Colors.BLACK, position)));
-        position = new Position('B', 8);
-        pieces.add(new ChessPair(position, new Knight(Colors.BLACK, position)));
-        position = new Position('C', 8);
-        pieces.add(new ChessPair(position, new Bishop(Colors.BLACK, position)));
-        position = new Position('D', 8);
-        pieces.add(new ChessPair(position, new Queen(Colors.BLACK, position)));
-        position = new Position('E', 8);
-        pieces.add(new ChessPair(position, new King(Colors.BLACK, position)));
-        position = new Position('F', 8);
-        pieces.add(new ChessPair(position, new Bishop(Colors.BLACK, position)));
-        position = new Position('G', 8);
-        pieces.add(new ChessPair(position, new Knight(Colors.BLACK, position)));
-        position = new Position('H', 8);
-        pieces.add(new ChessPair(position, new Rook(Colors.BLACK, position)));
+        for (int i = 0; i < 8; i++) {
+            pieces.add(createPiece("P", "black", (char) ('A' + i) + "7"))
+        }
+
+        pieces.add(createPiece("R", "white", "A1"));
+        pieces.add(createPiece("N", "white", "B1"));
+        pieces.add(createPiece("B", "white", "C1"));
+        pieces.add(createPiece("Q", "white", "D1"));
+        pieces.add(createPiece("K", "white", "E1"));
+        pieces.add(createPiece("B", "white", "F1"));
+        pieces.add(createPiece("N", "white", "G1"));
+        pieces.add(createPiece("R", "white", "H1"));
+
+        pieces.add(createPiece("R", "black", "A8"));
+        pieces.add(createPiece("N", "black", "B8"));
+        pieces.add(createPiece("B", "black", "C8"));
+        pieces.add(createPiece("Q", "black", "D8"));
+        pieces.add(createPiece("K", "black", "E8"));
+        pieces.add(createPiece("B", "black", "F8"));
+        pieces.add(createPiece("N", "black", "G8"));
+        pieces.add(createPiece("R", "black", "H8"));
+
         blackKing = new Position('E', 8);
         whiteKing = new Position('D', 1);
     }
@@ -128,7 +117,7 @@ public class Board {
         return null;
     }
 
-    public int movePiece(Position from, Position to,boolean player) {
+    public int movePiece(Position from, Position to,boolean player) throws InvalidMoveException {
         int ret = 0;
         if (!isValidMove(from, to)) {
             throw new InvalidMoveException("Invalid move: " + from + " - " + to);
@@ -170,13 +159,7 @@ public class Board {
                     newPiece = String.valueOf("QNBR".charAt(new Random().nextInt(4)));
                     System.out.println("Computer chose to change P into " + newPiece);
                 }
-                piece = switch (newPiece.charAt(0)) {
-                    case 'Q' -> new Queen(piece.getColor(), piece.getPosition());
-                    case 'N' -> new Knight(piece.getColor(), piece.getPosition());
-                    case 'B' -> new Bishop(piece.getColor(), piece.getPosition());
-                    case 'R' -> new Rook(piece.getColor(), piece.getPosition());
-                    default -> throw new InvalidMoveException("Invalid piece: " + newPiece);
-                };
+                piece = PieceFactory.factory(String.valueOf(newPiece.charAt(0)), piece.getColor(), piece.getPosition());
                 chessPair.setValue(piece);
                 ret = 1;
             }
