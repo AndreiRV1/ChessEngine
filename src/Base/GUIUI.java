@@ -1,6 +1,8 @@
+package Base;
+
+import GUI.Window;
+
 import javax.security.auth.login.LoginException;
-import javax.swing.*;
-import java.awt.event.ActionListener;
 
 public class GUIUI implements UIElement {
     private static GUIUI instance = null;
@@ -18,6 +20,6 @@ public class GUIUI implements UIElement {
 
     @Override
     public void run() throws LoginException {
-        System.out.println("Welcome to the GUI!");
+        Window window = new Window("Chess engine");
     }
 }

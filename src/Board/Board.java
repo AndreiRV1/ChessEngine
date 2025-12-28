@@ -45,7 +45,7 @@ public class Board {
         }
 
         for (int i = 0; i < 8; i++) {
-            pieces.add(createPiece("P", "black", (char) ('A' + i) + "7"))
+            pieces.add(createPiece("P", "black", (char) ('A' + i) + "7"));
         }
 
         pieces.add(createPiece("R", "white", "A1"));

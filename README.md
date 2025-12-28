@@ -24,7 +24,7 @@ You can reach the end of a game either if you resign, you reach a check-mate or 
 
 ## Classes overview
 
-*Main*
+*Base.Main*
 - Oversees login system
   - login() and newAccound() create/load _User_ acccounts
 - Writes and reads from files
@@ -32,19 +32,19 @@ You can reach the end of a game either if you resign, you reach a check-mate or 
     - write() writes to JSON
 - Runs the application
   - getEmail(), getLogin(), getCommand() handle user input
-- Yields execution to Game
-  - loadGame() and createGame() handle transfering control to Game class and user input
+- Yields execution to Base.Game
+  - loadGame() and createGame() handle transfering control to Base.Game class and user input
 
-*User*
+*Base.User*
 - Data representation of an application user
   - Setters and Getters
   - login() test for password
 
-*Player*
+*Base.Player*
 - Data representation for an in-game user
   - makeMove() updates board and internal structures accordingly
   - Setters and Getters
-*Game*
+*Base.Game*
 - Oversees the execution of the game phase
   - keeps track of current player(setCurrentPlayerColor(), switchPlayer())
   - Keeps move history
@@ -73,7 +73,7 @@ You can reach the end of a game either if you resign, you reach a check-mate or 
   - Moves pieces, checks for invalid choices and initializes board according to specifications
 
 ## Exceptions
-*InvalidCommandException* - User input invalid
+*InvalidCommandException* - Base.User input invalid
 *EndOfGame* - terminates game execution
 *InvalidLoginCredentials* - Login issues(incorrect credentials)
 *InvalidMoveException* - Move violates game rules
@@ -81,5 +81,5 @@ You can reach the end of a game either if you resign, you reach a check-mate or 
 
 ## Testing
 Use account test@test.com with password Test1!
-Game 13 tests changing your pawn, 14 the coputer's pawn, 15 check mate, 16 check, 17 - Take piece + points,
+Base.Game 13 tests changing your pawn, 14 the coputer's pawn, 15 check mate, 16 check, 17 - Take piece + points,
 18 - Persistent take piece + points

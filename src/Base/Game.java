@@ -1,3 +1,5 @@
+package Base;
+
 import Board.Board;
 import Board.ChessPair;
 import Board.Position;
@@ -174,7 +176,7 @@ public class Game {
                     }
                 }
             } else {
-                // Player is computer
+                // Base.Player is computer
                 TreeSet<ChessPair<Position, Piece>> pieces = board.getPieces(currentPlayer.color);
                 i = 0;
                 while(true) {

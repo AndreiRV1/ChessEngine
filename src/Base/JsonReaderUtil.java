@@ -1,3 +1,5 @@
+package Base;
+
 import Board.Board;
 import Pieces.*;
 import Board.Position;
@@ -109,7 +111,7 @@ public final class JsonReaderUtil {
      * The structure strictly follows games.json as provided (no title/genre).
      *
      * @param path path to games.json
-     * @return map id -> Game (empty if file missing or array empty)
+     * @return map id -> Base.Game (empty if file missing or array empty)
      * @throws IOException    if I/O fails
      * @throws ParseException if JSON is invalid
      */

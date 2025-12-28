@@ -1,3 +1,5 @@
+package Base;
+
 import Exceptions.EndOfGame;
 import Exceptions.InvalidCommandException;
 import Exceptions.InvalidLoginCredentials;
@@ -39,7 +41,7 @@ public class CLIUI implements UIElement {
 
     private boolean getLogin(Scanner sc) throws LoginException {
         boolean login = false;
-        System.out.println("Welcome to my Chess Game. Are you a returning user?(y/n) If you want to quit press q.");
+        System.out.println("Welcome to my Chess Base.Game. Are you a returning user?(y/n) If you want to quit press q.");
         while (true) {
             try {
                 String command = sc.nextLine();
@@ -96,10 +98,10 @@ public class CLIUI implements UIElement {
         try {
             id = Long.parseLong(command);
         } catch (NumberFormatException e) {
-            throw new InvalidCommandException("Invalid Game");
+            throw new InvalidCommandException("Invalid Base.Game");
         }
         if (!gameIds.contains(id))
-            throw new InvalidCommandException("Invalid Game");
+            throw new InvalidCommandException("Invalid Base.Game");
         Game selectedGame = null;
         for (Game game : currentUser.getActiveGames()) {
             if (game.getId() == id) {
@@ -116,16 +118,7 @@ public class CLIUI implements UIElement {
                 if (comm.charAt(0) == 'i') {
                     System.out.println(selectedGame);
                 } else if (comm.charAt(0) == 'c') {
-                    try {
-                        selectedGame.resume();
-                    } catch (EndOfGame e) {
-                        System.out.println(e.getMessage());
-                        int points = currentUser.getPoints() + selectedGame.players.get(selectedGame.crtPlayer).getPoints();
-                        currentUser.setPoints(points);
-                        System.out.println("You gained " + points+" points. You have " + currentUser.getPoints() + " points");
-                        currentUser.removeGame(selectedGame);
-                        Main.getInstance().games.remove(id, selectedGame);
-                    }
+                    Main.getInstance().loadGame(selectedGame);
                 } else if (comm.charAt(0) == 'd') {
                     currentUser.removeGame(selectedGame);
                     Main.getInstance().games.remove(id, selectedGame);
@@ -140,7 +133,6 @@ public class CLIUI implements UIElement {
     }
 
     void createGame(Scanner sc) {
-        User currentUser = Main.getInstance().currentUser;
         System.out.println("Creating game.");
         System.out.println("Please enter a nickname:");
         String nickname = sc.nextLine();

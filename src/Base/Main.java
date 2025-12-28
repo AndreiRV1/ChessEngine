@@ -1,14 +1,15 @@
+package Base;
+
 import Exceptions.EndOfGame;
-import Exceptions.InvalidCommandException;
 import Exceptions.InvalidLoginCredentials;
 import Exceptions.NotFoundException;
-import Pieces.Colors;
 import org.json.simple.parser.ParseException;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
+
 
 public class Main {
     List<User> users;
@@ -21,6 +22,10 @@ public class Main {
         users = new ArrayList<>();
         games = new HashMap<>();
         currentUser = null;
+    }
+
+    public User getCurrentUser() {
+        return currentUser;
     }
 
     public static Main getInstance(){
@@ -52,7 +57,7 @@ public class Main {
                 }
             }
         }
-        throw new NotFoundException("User not found");
+        throw new NotFoundException("Base.User not found");
     }
 
     public User newAccount(String email, String password) throws InvalidLoginCredentials {
@@ -81,7 +86,21 @@ public class Main {
         }
     }
 
+    public void loadGame(Game selectedGame){
+        try {
+            selectedGame.resume();
+        } catch (EndOfGame e) {
+            System.out.println(e.getMessage());
+            int points = currentUser.getPoints() + selectedGame.players.get(selectedGame.crtPlayer).getPoints();
+            currentUser.setPoints(points);
+            System.out.println("You gained " + points+" points. You have " + currentUser.getPoints() + " points");
+            currentUser.removeGame(selectedGame);
+            Main.getInstance().games.remove(selectedGame.getId(), selectedGame);
+        }
+    }
+
     public static void main(String[] args) {
+
         Main app = getInstance();
         if(args.length == 0){
             System.out.println("Please specify UI mode: CLI/GUI");

@@ -1,10 +1,11 @@
+package Base;
+
 import Board.Board;
 import Board.ChessPair;
 import Board.Position;
 import Exceptions.InvalidCommandException;
 import Pieces.*;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
@@ -93,5 +94,10 @@ public class Player {
         this.points += points;
         if(this.points < 0)
             this.points = 0;
+    }
+
+    @Override
+    public String toString() {
+        return name + " ,color: " + color +" ,points: " + points;
     }
 }
