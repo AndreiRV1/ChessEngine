@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 public class Player {
-    String name;
+    public String  name;
     Colors color;
     private List<Piece> capturedPieces;
     private TreeSet<ChessPair<Position,Piece>> pieces;

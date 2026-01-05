@@ -2,14 +2,16 @@ package GUI;
 
 import Base.Game;
 import Base.Main;
+import Base.Player;
 import Base.User;
+import Board.Move;
 import Pieces.Colors;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentListener;
+import java.util.Map;
 
 public class LoadGamePanel extends JPanel implements ActionListener {
     JComboBox<Long> games;
@@ -18,6 +20,7 @@ public class LoadGamePanel extends JPanel implements ActionListener {
     JTextArea history;
     JButton load;
     Game game;
+    GUIBoard GUIBoard;
 
     LoadGamePanel(){
         super();
@@ -36,9 +39,12 @@ public class LoadGamePanel extends JPanel implements ActionListener {
 
         games.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        GUIBoard = new GUIBoard(false);
+
         add(games);
         add(player1);
         add(player2);
+        add(GUIBoard);
         add(scroll);
         add(load);
     }
@@ -61,6 +67,11 @@ public class LoadGamePanel extends JPanel implements ActionListener {
             }
             player1.setText(game.getPlayer(Colors.WHITE).toString());
             player2.setText(game.getPlayer(Colors.BLACK).toString());
+            GUIBoard.updateContent(game.getBoard());
+            history.setText("");
+            for (Map.Entry<Move, Player> set : game.moveHistory.entrySet()){
+                history.append(set.getValue().name + ": " + set.getKey().toString() + "\n");
+            }
         }
         if(e.getSource() == load){
             Main.getInstance().loadGame(game);

@@ -18,7 +18,7 @@ public class Window extends JFrame implements ActionListener, Observer {
     public Window(String title) {
         super(title);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(500,500));
+        setMinimumSize(new Dimension(1024,1024));
         cardLayout = new CardLayout();
         setLayout(cardLayout);
 

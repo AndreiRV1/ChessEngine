@@ -48,6 +48,6 @@ public class Move {
 
     @Override
     public String toString() {
-        return "Color: " + color + " ,last position: " + lastPosition + " ,next position: " + nextPosition + ((capturedPiece != null) ? (" Caputred piece" + capturedPiece) : " No piece captured" + ((specialMove != null)?specialMove:""));
+        return "Color: " + color + " ,last position: " + lastPosition + " ,next position: " + nextPosition + ((capturedPiece != null) ? (" Caputred piece" + capturedPiece) : "") + ((specialMove != null)?specialMove:"");
     }
 }

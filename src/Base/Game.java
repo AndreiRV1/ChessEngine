@@ -20,7 +20,7 @@ public class Game {
     Board board;
     List<Player> players;
     int crtPlayer;
-    Map<Move, Player> moveHistory;
+    public Map<Move, Player> moveHistory;
     boolean loaded = false;
 
     public Game(long identifier, List<Player> players) {
@@ -256,6 +256,10 @@ public class Game {
 
     public void setBoard(Board board) {
         this.board = board;
+    }
+
+    public Board getBoard(){
+        return board;
     }
 
     public long getId() {

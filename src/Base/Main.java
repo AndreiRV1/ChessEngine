@@ -105,9 +105,9 @@ public class Main {
         if(args.length == 0){
             System.out.println("Please specify UI mode: CLI/GUI");
         }
-        if(args[0].equals("CLI")){
+        if(args[0].equalsIgnoreCase("CLI")){
             ui = CLIUI.getInstance();
-        } else if(args[0].equals("GUI")){
+        } else if(args[0].equalsIgnoreCase("GUI")){
             ui = GUIUI.getInstance();
         }
 
