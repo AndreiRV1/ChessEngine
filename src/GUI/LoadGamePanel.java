@@ -51,6 +51,7 @@ public class LoadGamePanel extends JPanel implements ActionListener {
 
     public void updateContent(){
         User currentUser = Main.getInstance().getCurrentUser();
+        games.removeAllItems();
         for(Game g:currentUser.getActiveGames()){
             games.addItem(g.getId());
         }
@@ -67,7 +68,7 @@ public class LoadGamePanel extends JPanel implements ActionListener {
             }
             player1.setText(game.getPlayer(Colors.WHITE).toString());
             player2.setText(game.getPlayer(Colors.BLACK).toString());
-            GUIBoard.updateContent(game.getBoard());
+            GUIBoard.updateContent(game);
             history.setText("");
             for (Map.Entry<Move, Player> set : game.moveHistory.entrySet()){
                 history.append(set.getValue().name + ": " + set.getKey().toString() + "\n");

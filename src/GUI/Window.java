@@ -1,5 +1,6 @@
 package GUI;
 
+import Base.Game;
 import Base.Observer;
 
 import javax.swing.*;
@@ -10,7 +11,7 @@ import java.awt.event.ActionListener;
 public class Window extends JFrame implements ActionListener, Observer {
     CardLayout cardLayout;
     LoginPanel loginPanel;
-    JPanel gamePanel;
+    GamePannel gamePanel;
     MenuPanel menuPanel;
     JPanel winPanel;
     JPanel exitPanel;
@@ -18,7 +19,7 @@ public class Window extends JFrame implements ActionListener, Observer {
     public Window(String title) {
         super(title);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(1024,1024));
+        setMinimumSize(new Dimension(1600,1024));
         cardLayout = new CardLayout();
         setLayout(cardLayout);
 
@@ -29,13 +30,15 @@ public class Window extends JFrame implements ActionListener, Observer {
         menuPanel.addObserver(this);
 
 
-        gamePanel = new JPanel();
+        gamePanel = new GamePannel();
+        gamePanel.addObserver(this);
+
         winPanel = new JPanel();
         exitPanel = new JPanel();
 
         add("Login", loginPanel);
         add("Menu", menuPanel);
-        add("Base.Game", gamePanel);
+        add("Game", gamePanel);
         add("Exit", exitPanel);
         add("Win", winPanel);
         pack();
@@ -56,12 +59,20 @@ public class Window extends JFrame implements ActionListener, Observer {
                 loginPanel.updateContent();
                 break;
             case 1:
-                cardLayout.next(getContentPane());
+                cardLayout.show(getContentPane(),"Menu");
                 menuPanel.updateContent();
+                break;
+            case 2:
+                cardLayout.show(getContentPane(), "Game");
+                gamePanel.updateContent();
                 break;
             default:
                 break;
         }
         repaint();
+    }
+
+    public void setGame(Game game){
+        gamePanel.game = game;
     }
 }

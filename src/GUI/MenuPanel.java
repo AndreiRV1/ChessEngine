@@ -19,12 +19,26 @@ public class MenuPanel extends JPanel implements ActionListener, Subject {
     NewGamePanel newGamePanel;
     LoadGamePanel loadGamePanel;
     JPanel context;
+    ImageIcon leftPage = new ImageIcon("Images/left.png");
+    ImageIcon rightPage = new ImageIcon("Images/right.png");
+
 
     public MenuPanel() {
         setLayout(new GridLayout(1,2));
-        JPanel menu = new JPanel();
-        context = new JPanel();
-        context.setBackground(Color.MAGENTA);
+        JPanel menu = new JPanel(){
+            @Override
+            public void paintComponent(Graphics g){
+                super.paintComponent(g);
+                g.drawImage(rightPage.getImage(),0,0,getWidth(),getHeight(),this);
+            }
+        };
+        context = new JPanel(){
+            @Override
+            public void paintComponent(Graphics g){
+                super.paintComponent(g);
+                g.drawImage(leftPage.getImage(),0,0,getWidth(),getHeight(),this);
+            }
+        };
         GroupLayout layout = new GroupLayout(menu);
         title = new JLabel("The Menu");
         activeGames = new JLabel(" Games");
@@ -71,8 +85,20 @@ public class MenuPanel extends JPanel implements ActionListener, Subject {
         newGame.addActionListener(this);
         loadGame.addActionListener(this);
 
-        newGamePanel = new NewGamePanel();
-        loadGamePanel = new LoadGamePanel();
+        newGamePanel = new NewGamePanel(){
+            @Override
+            public void paintComponent(Graphics g){
+                super.paintComponent(g);
+                g.drawImage(leftPage.getImage(),0,0,getWidth(),getHeight(),this);
+            }
+        };
+        loadGamePanel = new LoadGamePanel(){
+            @Override
+            public void paintComponent(Graphics g){
+                super.paintComponent(g);
+                g.drawImage(leftPage.getImage(),0,0,getWidth(),getHeight(),this);
+            }
+        };
 
         add(context);
         add(menu);
@@ -85,6 +111,7 @@ public class MenuPanel extends JPanel implements ActionListener, Subject {
         activeGames.setText(currentUser.getActiveGames().size() + " Games");
         points.setText(currentUser.getPoints() + " Points");
         activeUser.setText(currentUser.getEmail());
+        loadGamePanel.updateContent();
     }
 
     @Override
@@ -113,7 +140,6 @@ public class MenuPanel extends JPanel implements ActionListener, Subject {
         if(e.getSource() == loadGame){
             remove(0);
             add(loadGamePanel,0);
-            loadGamePanel.updateContent();
             revalidate();
             repaint();
         }

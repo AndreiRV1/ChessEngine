@@ -6,6 +6,7 @@ import javax.security.auth.login.LoginException;
 
 public class GUIUI implements UIElement {
     private static GUIUI instance = null;
+    Window window;
 
     private GUIUI() {
     }
@@ -20,6 +21,12 @@ public class GUIUI implements UIElement {
 
     @Override
     public void run() throws LoginException {
-        Window window = new Window("Chess engine");
+        window = new Window("Chess engine");
+    }
+
+    @Override
+    public void runGame(Game game) {
+        window.setGame(game);
+        window.update(2);
     }
 }

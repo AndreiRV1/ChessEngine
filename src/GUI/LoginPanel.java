@@ -18,6 +18,8 @@ public class LoginPanel extends JPanel implements ActionListener, Subject {
     PasswordField password;
     JLabel Title;
     Button login, createAccount;
+    ImageIcon table = new ImageIcon("Images/table.png");
+    ImageIcon cover = new ImageIcon("Images/cover.png");
     public LoginPanel(){
         super(new GridLayout(1,2));
         email = new TextField(20);
@@ -29,10 +31,21 @@ public class LoginPanel extends JPanel implements ActionListener, Subject {
         Title = new JLabel("WELCOME");
 
 
-        JPanel background = new JPanel();
-        background.setBackground(Color.MAGENTA);
+        JPanel background = new JPanel(){
+            @Override
+            public void paintComponent(Graphics g){
+                super.paintComponent(g);
+                g.drawImage(table.getImage(),0,0,this);
+            }
+        };
 
-        JPanel loginPanel = new JPanel();
+        JPanel loginPanel = new JPanel(){
+            @Override
+            public void paintComponent(Graphics g){
+                super.paintComponent(g);
+                g.drawImage(cover.getImage(),0,0,getWidth(),getHeight(),this);
+            }
+        };
         GroupLayout layout = new GroupLayout(loginPanel);
         loginPanel.setLayout(layout);
         layout.setAutoCreateGaps(true);

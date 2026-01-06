@@ -76,7 +76,9 @@ public class Main {
         games.put(newGame.getId(), newGame);
         currentUser.addGame(newGame);
         try {
+            System.out.println("Creating game");
             newGame.start();
+            ui.runGame(newGame);
         } catch (EndOfGame e) {
             System.out.println(e.getMessage());
             currentUser.setPoints(currentUser.getPoints() + newGame.players.get(newGame.crtPlayer).getPoints());
@@ -88,7 +90,8 @@ public class Main {
 
     public void loadGame(Game selectedGame){
         try {
-            selectedGame.resume();
+            System.out.println("Loading game " + selectedGame.getId());
+            ui.runGame(selectedGame);
         } catch (EndOfGame e) {
             System.out.println(e.getMessage());
             int points = currentUser.getPoints() + selectedGame.players.get(selectedGame.crtPlayer).getPoints();

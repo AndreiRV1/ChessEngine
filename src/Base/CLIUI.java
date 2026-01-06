@@ -1,14 +1,17 @@
 package Base;
 
+import Board.Position;
 import Exceptions.EndOfGame;
 import Exceptions.InvalidCommandException;
 import Exceptions.InvalidLoginCredentials;
 import Exceptions.NotFoundException;
 import Pieces.Colors;
+import Pieces.Piece;
 
 import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class CLIUI implements UIElement {
@@ -29,8 +32,8 @@ public class CLIUI implements UIElement {
             try {
                 System.out.println("Please enter your email:");
                 email = sc.nextLine();
-                if (!email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"))
-                    throw new InvalidCommandException("Invalid Email");
+//                if (!email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"))
+//                    throw new InvalidCommandException("Invalid Email");
                 break;
             } catch (InvalidCommandException e) {
                 System.out.println(e.getMessage());
@@ -202,5 +205,58 @@ public class CLIUI implements UIElement {
             commandChar = getCommand(sc);
         }
         run();
+    }
+
+    @Override
+    public void runGame(Game game) {
+        Player crtPlayer = game.players.get(game.crtPlayer);
+        Position oldPosition = null,newPosition = null;
+        Scanner sc = new Scanner(System.in);
+        String command;
+        game.initialize();
+        while (true) {
+            crtPlayer = game.players.get(game.crtPlayer);
+            if (!Objects.equals(crtPlayer.name, "computer")) {
+                while (true) {
+                    try {
+                        System.out.println(game.board.toString(crtPlayer.color));
+                        System.out.println("Chose a piece to show moves, chose move, resign or exit:");
+                        command = sc.nextLine();
+                        if (command.equals("exit")) {
+                            return;
+                        }
+                        if (command.length() == 2) {
+                            Position pos = new Position(command);
+                            if (!pos.isValid())
+                                throw new InvalidCommandException("Invalid position");
+                            Piece piece = game.board.getPieceAt(pos);
+                            if (piece == null || piece.getColor() != crtPlayer.color) {
+                                System.out.println("[]");
+                            } else {
+                                System.out.println(game.board.getPieceAt(pos).getPossibleMoves(game.board));
+                            }
+                        } else if (command.length() == 5) {
+                            oldPosition = new Position(command.substring(0, 2));
+                            newPosition = new Position(command.substring(3, 5));
+                            if (command.charAt(2) != '-')
+                                throw new InvalidCommandException("Invalid position format. Please input like 'A1-A2'");
+                            break;
+                        } else if (command.equalsIgnoreCase("resign")) {
+                            crtPlayer.addPoints(-150);
+                            throw new EndOfGame("You have resigned");
+                        } else {
+                            throw new InvalidCommandException("Invalid command. Write position as A1 or move as A1-A2");
+                        }
+                    } catch (InvalidCommandException | IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+            }
+            try {
+                game.resume(oldPosition, newPosition);
+            }catch (InvalidCommandException e){
+                System.out.println(e.getMessage());
+            }
+        }
     }
 }

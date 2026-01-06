@@ -12,7 +12,7 @@ import java.util.TreeSet;
 
 public class Player {
     public String  name;
-    Colors color;
+    public Colors color;
     private List<Piece> capturedPieces;
     private TreeSet<ChessPair<Position,Piece>> pieces;
     private int points;
