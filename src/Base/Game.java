@@ -62,9 +62,16 @@ public class Game {
         return null;
     }
 
-    public void resume()  {
+    public Player getHumanPlayer(){
+        for(Player player : players){
+            if(!player.name.equalsIgnoreCase("computer"))
+                return player;
+        }
+        return null;
+    }
+
+    public void init(){
         Colors lastMove = null;
-        Position oldPosition, newPosition;
         for (Player player : players) {
             player.setPieces(board.getPieces(player.color));
         }
@@ -84,61 +91,108 @@ public class Game {
         }
         crtPlayer = (lastMove == players.getFirst().color)?0:1;
         switchPlayer();
+    }
+
+    public void checkEndOfGame(){
+        isInCheck = null;
+        Player currentPlayer = players.get(crtPlayer);
+
+        //Check for check
+        for(ChessPair<Position,Piece> p : board.getPieces(Colors.WHITE)){
+            if(p.getValue().checkForCheck(board,board.blackKing)){
+                isInCheck = Colors.BLACK;
+            }
+        }
+        for(ChessPair<Position,Piece> p : board.getPieces(Colors.BLACK)){
+            if(p.getValue().checkForCheck(board,board.whiteKing)){
+                isInCheck = Colors.WHITE;
+            }
+        }
+
+        if(checkForMate()){
+            if(currentPlayer.color == isInMate){
+                currentPlayer.addPoints(-300);
+                switchPlayer();
+                currentPlayer = players.get(crtPlayer);
+                currentPlayer.addPoints(300);
+                if(currentPlayer.name.equals("computer")) {
+                    switchPlayer();
+                    currentPlayer = players.get(crtPlayer);
+
+                }
+                throw new EndOfGame(currentPlayer.name + " Lost");
+            }else{
+                currentPlayer.addPoints(300);
+                switchPlayer();
+                currentPlayer.addPoints(-300);
+                if(currentPlayer.name.equals("computer"))
+                    switchPlayer();
+                throw new EndOfGame(currentPlayer.name + " WON");
+            }
+        }
+        if(moveHistory.size() >= 6 && currentPlayer.name.equals("computer")) {
+            List<Move> moves =  moveHistory.keySet().stream().skip(moveHistory.size()-6).toList();
+            System.out.println(moves);
+            if(moves.get(0).getNextPosition().toString().equals(moves.get(2).getLastPosition().toString()) && moves.get(2).getNextPosition().toString().equals( moves.get(4).getLastPosition().toString())){
+                if(moves.get(1).getNextPosition().toString().equals(moves.get(3).getLastPosition().toString()) && moves.get(3).getNextPosition().toString().equals(moves.get(5).getLastPosition().toString())){
+                    switchPlayer();
+                    currentPlayer = players.get(crtPlayer);
+                    currentPlayer.addPoints(150);
+                    throw new EndOfGame("Computer RESIGNED(DRAW)");
+                }
+            }
+        }
+
+    }
+
+    public void makeMove(Position oldPosition, Position newPosition){
+        Player currentPlayer = players.get(crtPlayer);
+        ChessPair<String,Piece> output = currentPlayer.makeMove(oldPosition,newPosition,board);
+        addMove(currentPlayer,oldPosition,newPosition,output.getValue(),output.getKey());
+        switchPlayer();
+    }
+
+    public ChessPair<Position,Position> choseComputerMove(){
+        Player currentPlayer = players.get(crtPlayer);
+        Position oldPosition = null, newPosition = null;
+        TreeSet<ChessPair<Position, Piece>> pieces = board.getPieces(currentPlayer.color);
+        Random rand = new Random();
+        List<ChessPair<Position, Piece>> movablePieces = new ArrayList<>();
+
+        for (ChessPair<Position, Piece> pair : pieces) {
+            if (!pair.getValue().getPossibleMoves(board,true).isEmpty()) {
+                movablePieces.add(pair);
+            }
+        }
+
+        if (!movablePieces.isEmpty()) {
+            ChessPair<Position, Piece> selectedPair = movablePieces.get(rand.nextInt(movablePieces.size()));
+            Piece randomPiece = selectedPair.getValue();
+            List<Position> moves = randomPiece.getPossibleMoves(board);
+
+            oldPosition = randomPiece.getPosition();
+            newPosition = moves.get(rand.nextInt(moves.size()));
+
+            System.out.println("Computer chose: " + oldPosition + "-" + newPosition);
+        } else {
+            System.out.println("No legal moves available (Checkmate or Stalemate).");
+        }
+        return new ChessPair<Position, Position>(oldPosition,newPosition);
+    }
+
+    public void resume()  {
+        Position oldPosition, newPosition;
         Scanner sc = new Scanner(System.in);
         String command;
         while(true) {
             Player currentPlayer = players.get(crtPlayer);
             System.out.println(currentPlayer.name + "'s turn.");
-            isInCheck = null;
             System.out.print(board.toString(currentPlayer.color));
 
-            //Check for check
-            for(ChessPair<Position,Piece> p : board.getPieces(Colors.WHITE)){
-                if(p.getValue().checkForCheck(board,board.blackKing)){
-                    isInCheck = Colors.BLACK;
-                }
-            }
-            for(ChessPair<Position,Piece> p : board.getPieces(Colors.BLACK)){
-                if(p.getValue().checkForCheck(board,board.whiteKing)){
-                    isInCheck = Colors.WHITE;
-                }
-            }
+           checkEndOfGame();
+
             if(isInCheck != null)
                 System.out.println(isInCheck + " is in check.");
-
-            if(checkForMate()){
-                if(currentPlayer.color == isInMate){
-                    currentPlayer.addPoints(-300);
-                    switchPlayer();
-                    currentPlayer = players.get(crtPlayer);
-                    currentPlayer.addPoints(300);
-                    if(currentPlayer.name.equals("computer")) {
-                        switchPlayer();
-                        currentPlayer = players.get(crtPlayer);
-
-                    }
-                    throw new EndOfGame(currentPlayer.name + " Lost");
-                }else{
-                    currentPlayer.addPoints(300);
-                    switchPlayer();
-                    currentPlayer.addPoints(-300);
-                    if(currentPlayer.name.equals("computer"))
-                        switchPlayer();
-                    throw new EndOfGame(currentPlayer.name + " WON");
-                }
-            }
-            if(moveHistory.size() >= 6 && currentPlayer.name.equals("computer")) {
-                List<Move> moves =  moveHistory.keySet().stream().skip(moveHistory.size()-6).toList();
-                System.out.println(moves);
-                if(moves.get(0).getNextPosition().toString().equals(moves.get(2).getLastPosition().toString()) && moves.get(2).getNextPosition().toString().equals( moves.get(4).getLastPosition().toString())){
-                    if(moves.get(1).getNextPosition().toString().equals(moves.get(3).getLastPosition().toString()) && moves.get(3).getNextPosition().toString().equals(moves.get(5).getLastPosition().toString())){
-                        switchPlayer();
-                        currentPlayer = players.get(crtPlayer);
-                        currentPlayer.addPoints(150);
-                        throw new EndOfGame("Computer RESIGNED(DRAW)");
-                    }
-                }
-            }
 
             if (!Objects.equals(currentPlayer.name, "computer")) {
                 while (true) {
@@ -176,32 +230,13 @@ public class Game {
                     }
                 }
             } else {
-                // Base.Player is computer
-                TreeSet<ChessPair<Position, Piece>> pieces = board.getPieces(currentPlayer.color);
-                i = 0;
-                while(true) {
-                    try {
-                        int pieceIdx = new Random().nextInt(pieces.size());
-                        Piece randomPiece = null;
-                        for (ChessPair<Position, Piece> piece : pieces) {
-                            if (i == pieceIdx) {
-                                randomPiece = piece.getValue();
-                                break;
-                            }
-                            i++;
-                        }
-                        List<Position> moves = randomPiece.getPossibleMoves(board);
-                        oldPosition = randomPiece.getPosition();
-                        newPosition = moves.get(new Random().nextInt(moves.size()));
-                        System.out.println("Computer chose: "+ oldPosition +"-"+ newPosition);
-                        break;
-                    } catch (Exception ignored){}
-                }
+                // Player is computer
+                ChessPair<Position,Position> choice = choseComputerMove();
+                oldPosition = choice.getKey();
+                newPosition = choice.getValue();
 
             }
-            ChessPair<String,Piece> output = currentPlayer.makeMove(oldPosition,newPosition,board);
-            addMove(currentPlayer,oldPosition,newPosition,output.getValue(),output.getKey());
-            switchPlayer();
+            makeMove(oldPosition,newPosition);
         }
     }
 

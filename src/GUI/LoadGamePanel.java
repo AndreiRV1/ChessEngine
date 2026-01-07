@@ -39,7 +39,7 @@ public class LoadGamePanel extends JPanel implements ActionListener {
 
         games.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        GUIBoard = new GUIBoard(false);
+        GUIBoard = new GUIBoard(false,400);
 
         add(games);
         add(player1);

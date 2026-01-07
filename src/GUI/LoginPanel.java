@@ -5,6 +5,8 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+
 import Base.Main;
 import Base.Observer;
 import Base.Subject;
@@ -14,6 +16,7 @@ import Exceptions.InvalidLoginCredentials;
 
 public class LoginPanel extends JPanel implements ActionListener, Subject {
     Observer observer;
+    Font oldEnglish;
     TextField email;
     PasswordField password;
     JLabel Title;
@@ -28,7 +31,14 @@ public class LoginPanel extends JPanel implements ActionListener, Subject {
 
         login = new Button("Login");
         createAccount = new Button("Create Account");
-        Title = new JLabel("WELCOME");
+        Title = new JLabel("Chess Book");
+
+        try {
+            oldEnglish = Font.createFont(Font.TRUETYPE_FONT, new File("Fonts/oldEnglish.ttf")).deriveFont(100f);
+        }catch (Exception ignored){}
+        Title.setFont(oldEnglish);
+        Title.setForeground(Color.decode("#1A0F00"));
+
 
 
         JPanel background = new JPanel(){
@@ -79,6 +89,7 @@ public class LoginPanel extends JPanel implements ActionListener, Subject {
 
         add(background);
         add(loginPanel);
+
 
         login.addActionListener(this);
         createAccount.addActionListener(this);

@@ -26,6 +26,7 @@ public class GUIUI implements UIElement {
 
     @Override
     public void runGame(Game game) {
+        game.init();
         window.setGame(game);
         window.update(2);
     }
