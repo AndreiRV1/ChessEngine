@@ -2,6 +2,7 @@ package Board;
 
 import Pieces.Colors;
 import Pieces.Piece;
+import Pieces.PieceFactory;
 
 public class Move {
     private Colors color;
@@ -48,6 +49,6 @@ public class Move {
 
     @Override
     public String toString() {
-        return "Color: " + color + " ,last position: " + lastPosition + " ,next position: " + nextPosition + ((capturedPiece != null) ? (" Caputred piece" + capturedPiece) : "") + ((specialMove != null)?specialMove:"");
+        return (color == Colors.WHITE ? "○ : " : "◉ : ")  + lastPosition + "→" + nextPosition + ((capturedPiece != null) ? (" (caputred " + PieceFactory.pieceUnicode(capturedPiece.type())) + ") " : "") + ((specialMove != null)?specialMove:"");
     }
 }

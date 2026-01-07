@@ -1,5 +1,6 @@
 package GUI;
 
+import javax.security.auth.login.LoginException;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -8,14 +9,14 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 import Base.Main;
-import Base.Observer;
-import Base.Subject;
-import Base.User;
+import Base.Observers.GUIObserver;
+import Base.Observers.GUISubject;
 import Exceptions.InvalidLoginCredentials;
+import Exceptions.NotFoundException;
 
 
-public class LoginPanel extends JPanel implements ActionListener, Subject {
-    Observer observer;
+public class LoginPanel extends JPanel implements ActionListener, GUISubject {
+    GUIObserver GUIObserver;
     Font oldEnglish;
     TextField email;
     PasswordField password;
@@ -23,6 +24,7 @@ public class LoginPanel extends JPanel implements ActionListener, Subject {
     Button login, createAccount;
     ImageIcon table = new ImageIcon("Images/table.png");
     ImageIcon cover = new ImageIcon("Images/cover.png");
+    JLabel error;
     public LoginPanel(){
         super(new GridLayout(1,2));
         email = new TextField(20);
@@ -32,6 +34,15 @@ public class LoginPanel extends JPanel implements ActionListener, Subject {
         login = new Button("Login");
         createAccount = new Button("Create Account");
         Title = new JLabel("Chess Book");
+        error = new JLabel();
+        error.setFont(new Font("SansSerif", Font.BOLD, 16));
+        error.setForeground(new Color(190, 160, 80));
+
+        LeatherPatchPanel pannel1 = new LeatherPatchPanel();
+        LeatherPatchPanel pannel2 = new LeatherPatchPanel();
+        pannel1.add(email);
+        pannel2.add(password);
+
 
         try {
             oldEnglish = Font.createFont(Font.TRUETYPE_FONT, new File("Fonts/oldEnglish.ttf")).deriveFont(100f);
@@ -64,8 +75,9 @@ public class LoginPanel extends JPanel implements ActionListener, Subject {
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(Title)
-                        .addComponent(email, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(password, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(pannel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(pannel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(error, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(createAccount)
                                 .addGap(5)
@@ -76,9 +88,11 @@ public class LoginPanel extends JPanel implements ActionListener, Subject {
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(Title)
                     .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(email, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addComponent(password, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(pannel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(pannel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addGap(20)
+                .addComponent(error)
+                        .addGap(10)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
                     .addComponent(createAccount)
                     .addComponent(login))
@@ -93,20 +107,29 @@ public class LoginPanel extends JPanel implements ActionListener, Subject {
 
         login.addActionListener(this);
         createAccount.addActionListener(this);
-        loginPanel.add(email);
+        loginPanel.add(pannel1);
         loginPanel.add(login);
-        loginPanel.add(password);
+        loginPanel.add(pannel2);
         loginPanel.add(createAccount);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if(email.getText().isEmpty() || password.getPassword().length == 0) {
+            error.setText("Please provide credentials");
+            return;
+        }
+
         if(e.getSource() == login){
             try {
                 Main.getInstance().login(email.getText(), String.valueOf(password.getPassword()));
                 notifyObservers(1);
             }catch (InvalidLoginCredentials exception){
                 System.out.println(exception.getMessage());
+                error.setText("Invalid email-password combination");
+            } catch (NotFoundException loginException) {
+                System.out.println(loginException.getMessage());
+                error.setText("User not found. Create a new account");
             }
         }
         if(e.getSource() == createAccount){
@@ -125,17 +148,17 @@ public class LoginPanel extends JPanel implements ActionListener, Subject {
     }
 
     @Override
-    public void addObserver(Observer observer) {
-        this.observer = observer;
+    public void addObserver(GUIObserver GUIObserver) {
+        this.GUIObserver = GUIObserver;
     }
 
     @Override
-    public void removeObserver(Observer observer) {
-        this.observer = null;
+    public void removeObserver(GUIObserver GUIObserver) {
+        this.GUIObserver = null;
     }
 
     @Override
     public void notifyObservers(int event) {
-        observer.update(event);
+        GUIObserver.updatePage(event);
     }
 }

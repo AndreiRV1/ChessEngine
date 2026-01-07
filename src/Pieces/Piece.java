@@ -3,6 +3,7 @@ package Pieces;
 import Board.Board;
 import Board.Position;
 import Board.ChessPair;
+import Pieces.Moves.MoveStrategy;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ public abstract class Piece implements ChessPiece {
     public boolean hasMoved;
     private final Colors color;
     Position position;
+    MoveStrategy moveStrategy;
 
     public Piece(Colors color, Position position) {
         this.color = color;
@@ -96,7 +98,13 @@ public abstract class Piece implements ChessPiece {
         return moves;
     }
 
-    public abstract List<Position> getPossibleMoves(Board board, boolean check);
+    public List<Position> getPossibleMoves(Board board, boolean check) {
+        return moveStrategy.getPossibleMoves(board, position, check);
+    }
+
+    public List<Position> getPossibleMoves(Board board) {
+        return getPossibleMoves(board,true);
+    }
 
     @Override
     public boolean checkForCheck(Board board, Position kingPosition) {
@@ -113,5 +121,9 @@ public abstract class Piece implements ChessPiece {
 
     public void setPosition(Position newPosition) {
         position = newPosition;
+    }
+
+    public void setMoveStrategy(MoveStrategy moveStrategy) {
+        this.moveStrategy = moveStrategy;
     }
 }

@@ -1,21 +1,24 @@
 package GUI;
 
 import Base.Main;
-import Base.Observer;
-import Base.Subject;
+import Base.Observers.GUIObserver;
+import Base.Observers.GUISubject;
 import Base.User;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.print.Paper;
+import java.io.File;
 
-public class MenuPanel extends JPanel implements ActionListener, Subject {
-    Observer observer;
+public class MenuPanel extends JPanel implements ActionListener, GUISubject {
+    GUIObserver GUIObserver;
     JLabel title;
     JLabel activeGames, points;
     JLabel activeUser;
-    JButton newGame, loadGame, logout;
+    PaperButton newGame, loadGame, logout;
     NewGamePanel newGamePanel;
     LoadGamePanel loadGamePanel;
     JPanel context;
@@ -39,19 +42,39 @@ public class MenuPanel extends JPanel implements ActionListener, Subject {
                 g.drawImage(leftPage.getImage(),0,0,getWidth(),getHeight(),this);
             }
         };
-        GroupLayout layout = new GroupLayout(menu);
+
+        menu.setBorder(new EmptyBorder(0,0,0,50));
         title = new JLabel("The Menu");
+        Font oldEnglish, libre;
+        try {
+            oldEnglish = Font.createFont(Font.TRUETYPE_FONT, new File("Fonts/oldEnglish.ttf")).deriveFont(80f);
+            title.setFont(oldEnglish);
+        }catch (Exception ignored){}
+        title.setForeground(Color.decode("#18161B"));
+
+
         activeGames = new JLabel(" Games");
         points = new JLabel(" Points");
         activeUser = new JLabel("null");
-        newGame = new JButton("New Game");
-        loadGame = new JButton("Continue");
-        logout = new JButton("Logout");
+
+        try {
+            libre = Font.createFont(Font.TRUETYPE_FONT, new File("Fonts/libre.ttf")).deriveFont(30f);
+            activeUser.setFont(libre);
+            points.setFont(libre);
+            activeGames.setFont(libre);
+        }catch (Exception ignored){}
+
+        newGame = new PaperButton("New Game");
+        loadGame = new PaperButton("Continue");
+        logout = new PaperButton("Logout");
+
+        GroupLayout layout = new GroupLayout(menu);
         menu.setLayout(layout);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
 
         layout.setVerticalGroup(layout.createSequentialGroup()
+                .addGap(100)
                 .addComponent(title)
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(activeUser)
@@ -60,9 +83,10 @@ public class MenuPanel extends JPanel implements ActionListener, Subject {
                         .addComponent(points, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 )
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(newGame)
-                .addComponent(loadGame)
-                .addComponent(logout)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(newGame)
+                    .addComponent(loadGame)
+                    .addComponent(logout))
                 .addGap(0, 0, Short.MAX_VALUE)
         );
 
@@ -75,9 +99,10 @@ public class MenuPanel extends JPanel implements ActionListener, Subject {
                                 .addComponent(activeGames)
                                 .addGap(10)
                                 .addComponent(points))
+                        .addGroup(layout.createSequentialGroup()
                         .addComponent(newGame)
                         .addComponent(loadGame)
-                        .addComponent(logout))
+                        .addComponent(logout)))
                 .addGap(0, 0, Short.MAX_VALUE)
         );
 
@@ -108,25 +133,25 @@ public class MenuPanel extends JPanel implements ActionListener, Subject {
 
     public void updateContent(){
         User currentUser = Main.getInstance().getCurrentUser();
-        activeGames.setText(currentUser.getActiveGames().size() + " Games");
+        activeGames.setText(currentUser.getActiveGames().size() + " Games Active");
         points.setText(currentUser.getPoints() + " Points");
-        activeUser.setText(currentUser.getEmail());
+        activeUser.setText("Logged user: "+currentUser.getEmail());
         loadGamePanel.updateContent();
     }
 
     @Override
-    public void addObserver(Observer observer) {
-        this.observer = observer;
+    public void addObserver(GUIObserver GUIObserver) {
+        this.GUIObserver = GUIObserver;
     }
 
     @Override
-    public void removeObserver(Observer observer) {
-        this.observer = null;
+    public void removeObserver(GUIObserver GUIObserver) {
+        this.GUIObserver = null;
     }
 
     @Override
     public void notifyObservers(int event) {
-        observer.update(event);
+        GUIObserver.updatePage(event);
     }
 
     @Override

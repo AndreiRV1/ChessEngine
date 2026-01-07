@@ -42,7 +42,6 @@ public class Player {
         Piece capturedPiece = board.getPieceAt(new Position('a',0));
 
         if(capturedPiece != null){
-            addCapturedPiece(capturedPiece);
             board.pieces.remove(new ChessPair<Position, Piece>(new Position('a',0),capturedPiece));
         }
         return new ChessPair<String, Piece>(specialMove,capturedPiece);
@@ -50,29 +49,6 @@ public class Player {
 
     public void setPieces(TreeSet<ChessPair<Position,Piece>> pieces) {
         this.pieces = pieces;
-    }
-
-    public void addCapturedPiece(Piece capturedPiece) {
-        capturedPieces.add(capturedPiece);
-        System.out.println(name);
-        System.out.println(capturedPiece);
-        switch(capturedPiece.type()) {
-            case 'Q':
-                addPoints(90);
-                break;
-            case 'R':
-                addPoints(50);
-                break;
-            case 'B':
-                addPoints(30);
-                break;
-            case 'P':
-                addPoints(10);
-                break;
-            case 'N':
-                addPoints(30);
-                break;
-        }
     }
 
     public List<Piece> getCapturedPieces() {
@@ -98,6 +74,6 @@ public class Player {
 
     @Override
     public String toString() {
-        return name + " ,color: " + color +" ,points: " + points;
+        return name + "      " + (color == Colors.WHITE ? "○ : " : "◉ : ")  + points + "p";
     }
 }

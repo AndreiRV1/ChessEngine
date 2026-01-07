@@ -1,21 +1,21 @@
 package GUI;
 
 import Base.Game;
-import Base.Observer;
+import Base.Observers.GUIObserver;
 import Base.Player;
-import Base.Subject;
+import Base.Observers.GUISubject;
 import Board.Move;
 
-import javax.imageio.plugins.tiff.GeoTIFFTagSet;
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.Map;
 
-public class GamePannel extends JPanel implements ActionListener, Subject {
-    Button menuButton, exitButton, resignButton;
+public class GamePannel extends JPanel implements ActionListener, GUISubject {
+    Button menuButton, resignButton;
     JLabel title;
     JLabel points;
     JPanel color;
@@ -28,7 +28,7 @@ public class GamePannel extends JPanel implements ActionListener, Subject {
     ImageIcon leftPage = new ImageIcon("Images/left.png");
     ImageIcon rightPage = new ImageIcon("Images/right.png");
 
-    Observer observer;
+    GUIObserver GUIObserver;
 
     public GamePannel() {
         setLayout(new GridBagLayout());
@@ -36,7 +36,7 @@ public class GamePannel extends JPanel implements ActionListener, Subject {
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weighty = 1.0;
         constraints.gridx = 0;
-        constraints.weightx = 1.0;
+        constraints.weightx = 0.2;
 
         JPanel book = new JPanel();
         book.setLayout(new GridLayout(1,2));
@@ -59,6 +59,7 @@ public class GamePannel extends JPanel implements ActionListener, Subject {
                 g.drawImage(leftPage.getImage(),0,0,getWidth(),getHeight(),this);
             }
         };
+        historyPannel.setLayout(new BorderLayout());
         JPanel capturedPannel = new JPanel(){
             @Override
             public void paintComponent(Graphics g){
@@ -66,12 +67,13 @@ public class GamePannel extends JPanel implements ActionListener, Subject {
                 g.drawImage(table.getImage(),0,0,getWidth(),getHeight(),this);
             }
         };
+        capturedPannel.setLayout(new GridBagLayout());
 
 
         title = new JLabel("The Game");
         points = new  JLabel("0");
         color = new JPanel();
-        board = new GUIBoard(true,500);
+        board = new GUIBoard(true,200);
 
         color.setBackground(Color.BLACK);
         color.setPreferredSize(new Dimension(10,10));
@@ -82,8 +84,6 @@ public class GamePannel extends JPanel implements ActionListener, Subject {
 
         menuButton = new Button("Menu");
         menuButton.addActionListener(this);
-        exitButton = new Button("Exit");
-        exitButton.addActionListener(this);
         resignButton = new Button("Resign");
         resignButton.addActionListener(this);
 
@@ -100,9 +100,7 @@ public class GamePannel extends JPanel implements ActionListener, Subject {
                 .addGap(20,50,Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(points)
-                        .addComponent(exitButton))
-                .addGap(20, 50, Short.MAX_VALUE
-                ));
+                .addGap(20, 50, Short.MAX_VALUE)));
 
         layout.setVerticalGroup(layout.createSequentialGroup()
                 .addGap(0,0,Short.MAX_VALUE)
@@ -111,19 +109,20 @@ public class GamePannel extends JPanel implements ActionListener, Subject {
                         .addComponent(title)
                         .addComponent(points))
                 .addGap(0,0,Short.MAX_VALUE)
-                .addComponent(board)
+                .addComponent(board, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(0,0,Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup()
                         .addComponent(resignButton)
-                        .addComponent(menuButton)
-                        .addComponent(exitButton))
+                        .addComponent(menuButton))
         );
 
-        history = new JTextArea(200,200);
+        history = new JTextArea(20,20);
         history.setEditable(false);
+        history.setLineWrap(true);
+        history.setWrapStyleWord(true);
         scroll = new JScrollPane(history);
 
-        historyPannel.add(scroll);
+        historyPannel.add(scroll, BorderLayout.CENTER);
 
         capturedPieces = new JLabel("PIECES");
         capturedPannel.add(capturedPieces);
@@ -131,12 +130,24 @@ public class GamePannel extends JPanel implements ActionListener, Subject {
 
         book.add(historyPannel);
         book.add(mainPannel);
-        book.setMaximumSize(new Dimension(1000,1000));
 
         add(capturedPannel,constraints);
         constraints.gridx=1;
-        constraints.weightx=3.0;
+        constraints.weightx=0.8;
         add(book,constraints);
+
+
+        mainPannel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e){
+                int width = mainPannel.getWidth();
+                int height = mainPannel.getHeight();
+                int size = Math.min(width, height) / 2;
+                board.setSize(size);
+                mainPannel.revalidate();
+            }
+        });
+
     }
 
     void updateContent(){
@@ -150,27 +161,24 @@ public class GamePannel extends JPanel implements ActionListener, Subject {
     }
 
     @Override
-    public void addObserver(Observer observer) {
-        this.observer = observer;
+    public void addObserver(GUIObserver GUIObserver) {
+        this.GUIObserver = GUIObserver;
     }
 
     @Override
-    public void removeObserver(Observer observer) {
-        this.observer = null;
+    public void removeObserver(GUIObserver GUIObserver) {
+        this.GUIObserver = null;
     }
 
     @Override
     public void notifyObservers(int event) {
-        observer.update(event);
+        GUIObserver.updatePage(event);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == menuButton){
             notifyObservers(1);
-        }
-        if(e.getSource() == exitButton){
-            notifyObservers(0); //todo change to exit panel
         }
         //todo resign
     }

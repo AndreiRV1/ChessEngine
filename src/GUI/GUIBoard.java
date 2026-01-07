@@ -44,8 +44,9 @@ public class GUIBoard extends JPanel implements ActionListener {
 
     public void setSize(int size){
         setMaximumSize(new Dimension(size,size));
-        setMaximumSize(new Dimension(size,size));
+        setMinimumSize(new Dimension(size,size));
         setPreferredSize(new Dimension(size,size));
+        revalidate();
     }
 
     public GUIBoard(boolean isInteractable, int size) {

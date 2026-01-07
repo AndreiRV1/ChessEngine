@@ -2,28 +2,22 @@ package Pieces;
 
 import Board.Board;
 import Board.Position;
+import Pieces.Moves.KnightMoveStrategy;
 
 import java.util.List;
 
 public class Knight extends Piece {
     public Knight(Colors color, Position position) {
         super(color, position);
+        setMoveStrategy(new KnightMoveStrategy());
     }
 
     public Knight(String color, String position) {
         super(color, position);
+        setMoveStrategy(new KnightMoveStrategy());
     }
 
-    @Override
-    public List<Position> getPossibleMoves(Board board) {
-        int[][] directions = {{-2, 1}, {-2, -1}, {2, 1}, {2, -1}, {1, 2}, {-1, 2}, {1, -2}, {-1, -2}};
-        return getPossibleMovesPrototype(board, directions, false);
-    }
 
-    public List<Position> getPossibleMoves(Board board,boolean check) {
-        int[][] directions = {{-2, 1}, {-2, -1}, {2, 1}, {2, -1}, {1, 2}, {-1, 2}, {1, -2}, {-1, -2}};
-        return getPossibleMovesPrototype(board, directions, false, check);
-    }
     @Override
     public char type() {
         return 'N';

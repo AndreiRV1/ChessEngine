@@ -1,6 +1,5 @@
 package Base;
 
-import Exceptions.EndOfGame;
 import Exceptions.InvalidLoginCredentials;
 import Exceptions.NotFoundException;
 import org.json.simple.parser.ParseException;
@@ -11,7 +10,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 
-public class Main {
+public class Main{
     List<User> users;
     Map<Long, Game> games;
     User currentUser;
@@ -75,31 +74,16 @@ public class Main {
     public void createGame(Game newGame) {
         games.put(newGame.getId(), newGame);
         currentUser.addGame(newGame);
-        try {
             System.out.println("Creating game");
+            newGame.addObserver(ui);
             newGame.start();
             ui.runGame(newGame);
-        } catch (EndOfGame e) {
-            System.out.println(e.getMessage());
-            currentUser.setPoints(currentUser.getPoints() + newGame.players.get(newGame.crtPlayer).getPoints());
-            System.out.println("You have " + currentUser.getPoints() + " points");
-            currentUser.removeGame(newGame);
-            games.remove(newGame.getId(), newGame);
-        }
     }
 
     public void loadGame(Game selectedGame){
-        try {
             System.out.println("Loading game " + selectedGame.getId());
+            selectedGame.addObserver(ui);
             ui.runGame(selectedGame);
-        } catch (EndOfGame e) {
-            System.out.println(e.getMessage());
-            int points = currentUser.getPoints() + selectedGame.players.get(selectedGame.crtPlayer).getPoints();
-            currentUser.setPoints(points);
-            System.out.println("You gained " + points+" points. You have " + currentUser.getPoints() + " points");
-            currentUser.removeGame(selectedGame);
-            Main.getInstance().games.remove(selectedGame.getId(), selectedGame);
-        }
     }
 
     public static void main(String[] args) {
@@ -107,6 +91,7 @@ public class Main {
         Main app = getInstance();
         if(args.length == 0){
             System.out.println("Please specify UI mode: CLI/GUI");
+            System.exit(0);
         }
         if(args[0].equalsIgnoreCase("CLI")){
             ui = CLIUI.getInstance();
@@ -128,7 +113,7 @@ public class Main {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
-            System.out.println("Something went wrong while writing.");
+            System.out.println("Something went wrong.");
         }finally{
             try {
                 app.write();

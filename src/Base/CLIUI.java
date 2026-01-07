@@ -1,7 +1,7 @@
 package Base;
 
-import Board.Position;
-import Exceptions.EndOfGame;
+import Base.Observers.GameObserver;
+import Board.Move;
 import Exceptions.InvalidCommandException;
 import Exceptions.InvalidLoginCredentials;
 import Exceptions.NotFoundException;
@@ -11,7 +11,6 @@ import Pieces.Piece;
 import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Scanner;
 
 public class CLIUI implements UIElement {
@@ -32,8 +31,6 @@ public class CLIUI implements UIElement {
             try {
                 System.out.println("Please enter your email:");
                 email = sc.nextLine();
-//                if (!email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"))
-//                    throw new InvalidCommandException("Invalid Email");
                 break;
             } catch (InvalidCommandException e) {
                 System.out.println(e.getMessage());
@@ -157,6 +154,7 @@ public class CLIUI implements UIElement {
         players.add(new Player("computer", (colour == Colors.WHITE ? Colors.BLACK : Colors.WHITE)));
         Game newGame = new Game(players);
         Main.getInstance().createGame(newGame);
+        Main.getInstance().loadGame(newGame);
     }
 
     @Override
@@ -210,5 +208,41 @@ public class CLIUI implements UIElement {
     @Override
     public void runGame(Game game) {
         game.resume();
+    }
+
+    @Override
+    public void onMoveMade(Move move) {
+        System.out.println("Move made: "+ move.getLastPosition()+"-"+move.getNextPosition());
+    }
+
+    @Override
+    public void onPieceCaptured(Piece piece) {
+        System.out.println("Piece captured: " + piece.type());
+    }
+
+    @Override
+    public void onPlayerSwitch(Player currentPlayer) {
+        System.out.println(currentPlayer.name + "'s turn.");
+    }
+
+    @Override
+    public void onGameEnd(GameState result,Game game) {
+        int points = Main.getInstance().currentUser.getPoints() + game.getHumanPlayer().getPoints();
+        Main.getInstance().currentUser.setPoints(points);
+        Main.getInstance().currentUser.removeGame(game);
+        Main.getInstance().games.remove(game.getId(), game);
+        if(result == GameState.RESIGN){
+            // You resigned
+            System.out.println("You resigned");
+        } else if(result == GameState.DRAW){
+            //DRAW
+            System.out.println("Draw");
+        } else  if(result == GameState.WIN){
+            // WIN
+            System.out.println("You WON");
+        } else if(result == GameState.LOSE){
+            // LOSE
+            System.out.println("You LOST");
+        }
     }
 }

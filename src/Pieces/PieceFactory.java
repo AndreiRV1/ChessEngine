@@ -45,4 +45,22 @@ public class PieceFactory {
                 throw new InvalidMoveException("Illegal piece");
         }
     }
+    
+    public static char pieceUnicode(char type){
+        switch (type){
+            case 'N':
+                return '♘';
+            case 'K':
+                return '♔';
+            case 'Q':
+                return '♕';
+            case 'R':
+                return '♖';
+            case 'P':
+                return '♙';
+            case 'B':
+                return '♗';
+        }
+        return '?';
+    }
 }

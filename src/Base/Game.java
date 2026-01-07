@@ -1,10 +1,13 @@
 package Base;
 
+import Base.Observers.GameObserver;
+import Base.Observers.GameSubject;
+import Base.Strategy.ChessScoreStrategy;
+import Base.Strategy.ScoreStrategy;
 import Board.Board;
 import Board.ChessPair;
 import Board.Position;
 import Board.Move;
-import Exceptions.EndOfGame;
 import Exceptions.InvalidCommandException;
 import Pieces.Colors;
 import Pieces.Piece;
@@ -12,7 +15,7 @@ import Pieces.Piece;
 import java.util.*;
 import java.util.List;
 
-public class Game {
+public class Game implements GameSubject {
     static long last_identifier = 0;
     private final long identifier;
     public Colors isInMate;
@@ -22,6 +25,8 @@ public class Game {
     int crtPlayer;
     public Map<Move, Player> moveHistory;
     boolean loaded = false;
+    List<GameObserver> observers = new ArrayList<>();
+    ScoreStrategy scoreStrategy = new ChessScoreStrategy();
 
     public Game(long identifier, List<Player> players) {
         if (identifier > last_identifier) {
@@ -43,7 +48,6 @@ public class Game {
     public void start() {
         board.initialize();
         crtPlayer = (players.getFirst().color == Colors.WHITE) ? 0 : 1;
-        resume();
     }
 
     public void setCurrentPlayerColor(String color) {
@@ -78,7 +82,7 @@ public class Game {
         int i = moveHistory.size();
         for (Move m : moveHistory.keySet()) {
             if(m.getCapturedPiece() != null && !loaded){
-                getPlayer(m.getColor()).addCapturedPiece(m.getCapturedPiece());
+                getPlayer(m.getColor()).addPoints(scoreStrategy.getScoreForCapture(m.getCapturedPiece()));
             }
             if(i == 1){
                 lastMove = m.getColor();
@@ -110,24 +114,12 @@ public class Game {
         }
 
         if(checkForMate()){
-            if(currentPlayer.color == isInMate){
-                currentPlayer.addPoints(-300);
-                switchPlayer();
-                currentPlayer = players.get(crtPlayer);
-                currentPlayer.addPoints(300);
-                if(currentPlayer.name.equals("computer")) {
-                    switchPlayer();
-                    currentPlayer = players.get(crtPlayer);
-
-                }
-                throw new EndOfGame(currentPlayer.name + " Lost");
+            if(getHumanPlayer().color == isInMate){
+                getHumanPlayer().addPoints(scoreStrategy.getScoreForLoss());
+                notifyObservers(EventType.GAME_END.ordinal(), GameState.LOSE);
             }else{
-                currentPlayer.addPoints(300);
-                switchPlayer();
-                currentPlayer.addPoints(-300);
-                if(currentPlayer.name.equals("computer"))
-                    switchPlayer();
-                throw new EndOfGame(currentPlayer.name + " WON");
+                currentPlayer.addPoints(scoreStrategy.getScoreForWin());
+                notifyObservers(EventType.GAME_END.ordinal(), GameState.WIN);
             }
         }
         if(moveHistory.size() >= 6 && currentPlayer.name.equals("computer")) {
@@ -135,10 +127,8 @@ public class Game {
             System.out.println(moves);
             if(moves.get(0).getNextPosition().toString().equals(moves.get(2).getLastPosition().toString()) && moves.get(2).getNextPosition().toString().equals( moves.get(4).getLastPosition().toString())){
                 if(moves.get(1).getNextPosition().toString().equals(moves.get(3).getLastPosition().toString()) && moves.get(3).getNextPosition().toString().equals(moves.get(5).getLastPosition().toString())){
-                    switchPlayer();
-                    currentPlayer = players.get(crtPlayer);
-                    currentPlayer.addPoints(150);
-                    throw new EndOfGame("Computer RESIGNED(DRAW)");
+                    getHumanPlayer().addPoints(scoreStrategy.getScoreForDraw());
+                    notifyObservers(EventType.GAME_END.ordinal(), GameState.DRAW);
                 }
             }
         }
@@ -148,6 +138,7 @@ public class Game {
     public void makeMove(Position oldPosition, Position newPosition){
         Player currentPlayer = players.get(crtPlayer);
         ChessPair<String,Piece> output = currentPlayer.makeMove(oldPosition,newPosition,board);
+        currentPlayer.addPoints(scoreStrategy.getScoreForCapture(output.getValue()));
         addMove(currentPlayer,oldPosition,newPosition,output.getValue(),output.getKey());
         switchPlayer();
     }
@@ -186,7 +177,6 @@ public class Game {
         String command;
         while(true) {
             Player currentPlayer = players.get(crtPlayer);
-            System.out.println(currentPlayer.name + "'s turn.");
             System.out.print(board.toString(currentPlayer.color));
 
            checkEndOfGame();
@@ -220,8 +210,8 @@ public class Game {
                             List<Piece> taken = currentPlayer.getCapturedPieces();
                             break;
                         } else if(command.equalsIgnoreCase("resign")) {
-                            currentPlayer.addPoints(-150);
-                            throw new EndOfGame("You have resigned");
+                            currentPlayer.addPoints(scoreStrategy.getScoreForResign());
+                            notifyObservers(EventType.GAME_END.ordinal(), GameState.RESIGN);
                         }else{
                             throw new InvalidCommandException("Invalid command. Write position as A1 or move as A1-A2");
                         }
@@ -243,6 +233,7 @@ public class Game {
 
     public void switchPlayer() {
         crtPlayer = crtPlayer == 0 ? 1 : 0;
+        notifyObservers(EventType.PLAYER_SWITCH.ordinal(), players.get(crtPlayer));
     }
 
     public boolean checkForMate() {
@@ -275,6 +266,9 @@ public class Game {
 
     public void addMove(Player p, Position from, Position to,Piece capturedPiece,String specialMove) {
         Move move = new Move(p.color, from, to, capturedPiece,specialMove);
+        notifyObservers(EventType.MOVE_MADE.ordinal(), move);
+        if(capturedPiece != null)
+            notifyObservers(EventType.PIECE_CAPTURED.ordinal(), capturedPiece);
         moveHistory.put(move, p);
     }
 
@@ -316,4 +310,33 @@ public class Game {
         return sb.toString();
     }
 
+    @Override
+    public void addObserver(GameObserver Observer) {
+        if(!observers.contains(Observer))
+            observers.add(Observer);
+    }
+
+    @Override
+    public void notifyObservers(int event, Object context) {
+        if(event == EventType.MOVE_MADE.ordinal()) {
+            for (GameObserver observer : observers) {
+                observer.onMoveMade((Move)context);
+            }
+        }
+        if(event == EventType.PIECE_CAPTURED.ordinal()) {
+            for (GameObserver observer : observers) {
+                observer.onPieceCaptured((Piece) context);
+            }
+        }
+        if(event == EventType.PLAYER_SWITCH.ordinal()) {
+            for (GameObserver observer : observers) {
+                observer.onPlayerSwitch((Player)context);
+            }
+        }
+        if(event == EventType.GAME_END.ordinal()) {
+            for (GameObserver observer : observers) {
+                observer.onGameEnd((GameState)context, this);
+            }
+        }
+    }
 }
