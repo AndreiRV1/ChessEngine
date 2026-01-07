@@ -1,3 +1,57 @@
+    public void runGame(Game game) {
+        Player crtPlayer = game.players.get(game.crtPlayer);
+        Position oldPosition = null,newPosition = null;
+        Scanner sc = new Scanner(System.in);
+        String command;
+        game.initialize();
+        while (true) {
+            crtPlayer = game.players.get(game.crtPlayer);
+            if (!Objects.equals(crtPlayer.name, "computer")) {
+                while (true) {
+                    try {
+                        System.out.println(game.board.toString(crtPlayer.color));
+                        System.out.println("Chose a piece to show moves, chose move, resign or exit:");
+                        command = sc.nextLine();
+                        if (command.equals("exit")) {
+                            return;
+                        }
+                        if (command.length() == 2) {
+                            Position pos = new Position(command);
+                            if (!pos.isValid())
+                                throw new InvalidCommandException("Invalid position");
+                            Piece piece = game.board.getPieceAt(pos);
+                            if (piece == null || piece.getColor() != crtPlayer.color) {
+                                System.out.println("[]");
+                            } else {
+                                System.out.println(game.board.getPieceAt(pos).getPossibleMoves(game.board));
+                            }
+                        } else if (command.length() == 5) {
+                            oldPosition = new Position(command.substring(0, 2));
+                            newPosition = new Position(command.substring(3, 5));
+                            if (command.charAt(2) != '-')
+                                throw new InvalidCommandException("Invalid position format. Please input like 'A1-A2'");
+                            break;
+                        } else if (command.equalsIgnoreCase("resign")) {
+                            crtPlayer.addPoints(-150);
+                            throw new EndOfGame("You have resigned");
+                        } else {
+                            throw new InvalidCommandException("Invalid command. Write position as A1 or move as A1-A2");
+                        }
+                    } catch (InvalidCommandException | IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+            }
+            try {
+                game.resume(oldPosition, newPosition);
+            }catch (InvalidCommandException e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+
+
 package Base;
 
 import Board.Board;

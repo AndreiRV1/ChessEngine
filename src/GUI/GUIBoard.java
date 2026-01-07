@@ -42,10 +42,15 @@ public class GUIBoard extends JPanel implements ActionListener {
         }
     }
 
-    public GUIBoard(boolean isInteractable) {
+    public void setSize(int size){
+        setMaximumSize(new Dimension(size,size));
+        setMaximumSize(new Dimension(size,size));
+        setPreferredSize(new Dimension(size,size));
+    }
+
+    public GUIBoard(boolean isInteractable, int size) {
         setLayout(new GridLayout(8, 8,0,0));
-        setMaximumSize(new Dimension(512,512));
-        setMinimumSize(new Dimension(512,512));
+        setSize(size);
         for (int i = 0; i < buttons.length; i++) {
             if(i % 2 == 0)
                 crtColor = Colors.WHITE;
@@ -111,9 +116,10 @@ public class GUIBoard extends JPanel implements ActionListener {
             }
         } else{
             if(positions.contains(new Position((char) (x + 'A'), y + 1))){
-                game.resume(selected, new Position((char) (x + 'A'), y + 1));
+                game.makeMove(selected,new Position((char) (x + 'A'), y + 1));
                 updateContent(game);
-                game.resume(selected, selected);
+                ChessPair<Position,Position> computerChoice = game.choseComputerMove();
+                game.makeMove(computerChoice.getKey(), computerChoice.getValue());
                 updateContent(game);
                 selected = null;
             }else{
