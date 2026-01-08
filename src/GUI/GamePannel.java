@@ -46,13 +46,13 @@ public class GamePannel extends JPanel implements ActionListener, GUISubject {
     }
 
     public void checkCheck(){
+        game.checkEndOfGame();
         System.out.println(game.isInCheck + "Is in check");
-        if(game.isInCheck != null){
-            context.setText(game.isInCheck + " is in check");
-            context.setVisible(true);
-        }else{
-            context.setVisible(false);
-        }
+        context.setVisible(game.isInCheck != null);
+        context.revalidate();
+        context.repaint();
+        revalidate();
+        repaint();
     }
 
     public GamePannel() {
@@ -245,6 +245,10 @@ public class GamePannel extends JPanel implements ActionListener, GUISubject {
             history.append(i + ". " + set.getKey().toString() + "\n");
             i++;
         }
+        history.repaint();
+        history.revalidate();
+        revalidate();
+        repaint();
     }
 
     public void setCapturedPieces(){

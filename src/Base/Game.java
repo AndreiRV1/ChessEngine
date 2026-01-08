@@ -117,6 +117,7 @@ public class Game implements GameSubject {
         for(ChessPair<Position,Piece> p : board.getPieces(Colors.WHITE)){
             if(p.getValue().checkForCheck(board,board.blackKing)){
                 isInCheck = Colors.BLACK;
+                break;
             }
         }
         for(ChessPair<Position,Piece> p : board.getPieces(Colors.BLACK)){
@@ -150,6 +151,7 @@ public class Game implements GameSubject {
     public void makeMove(Position oldPosition, Position newPosition){
         Player currentPlayer = players.get(crtPlayer);
         ChessPair<String,Piece> output = currentPlayer.makeMove(oldPosition,newPosition,board);
+        checkEndOfGame();
         notifyObservers(EventType.MOVE_MADE.ordinal(), new Move(currentPlayer.color, oldPosition, newPosition, output.getValue(),output.getKey()));
         currentPlayer.addPoints(scoreStrategy.getScoreForCapture(output.getValue()));
         currentPlayer.addCapturedPiece(output.getValue());
