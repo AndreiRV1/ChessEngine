@@ -34,8 +34,6 @@ public class GamePannel extends JPanel implements ActionListener, GUISubject {
     GUIBoard board;
     Game game;
     ImageIcon book = new ImageIcon("Images/full.png");
-    JLabel changePiece;
-    JTextField typeChange;
 
     GUIObserver GUIObserver;
 
@@ -186,17 +184,6 @@ public class GamePannel extends JPanel implements ActionListener, GUISubject {
         }catch (Exception ignored){}
 
 
-
-        typeChange = new JTextField(15);
-
-        changePiece = new JLabel();
-        changePiece.setOpaque(false);
-        changePiece.setLayout(new FlowLayout());
-        changePiece.add(typeChange);
-
-        changePiece.setVisible(false);
-
-
         GroupLayout layout2 = new GroupLayout(contextPanel);
         layout2.setAutoCreateGaps(true);
         layout2.setAutoCreateContainerGaps(true);
@@ -206,7 +193,6 @@ public class GamePannel extends JPanel implements ActionListener, GUISubject {
                 .addGap(0,0,Short.MAX_VALUE)
                 .addGroup(layout2.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(context)
-                        .addComponent(changePiece)
                         .addComponent(scroll)
                         .addComponent(whiteScroll)
                         .addComponent(blackScroll))
@@ -216,7 +202,6 @@ public class GamePannel extends JPanel implements ActionListener, GUISubject {
         layout2.setVerticalGroup(layout2.createSequentialGroup()
                 .addGap(0,0,Short.MAX_VALUE)
                 .addComponent(context)
-                .addComponent(changePiece)
                 .addComponent(scroll)
                 .addGap(100)
                 .addComponent(whiteScroll)
@@ -320,20 +305,12 @@ public class GamePannel extends JPanel implements ActionListener, GUISubject {
         }
     }
 
-    public char changePiece(){
-        changePiece.setVisible(true);
-        typeChange.setText("");
-        typeChange.requestFocusInWindow();
-        try {
-            synchronized (this) {
-                wait();
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        while(!"QNBR".contains(typeChange.getText().toUpperCase())){
-            // i WANT TO WAIT UNTIL USER GIVES ME THAT INPUT(ONE OF THOSE LETTERS)
-        }
-        return typeChange.getText().charAt(0);
+    public char changePiece() {
+        String[] options = {"Queen", "Rook", "Bishop", "Knight"};
+        int response = JOptionPane.showOptionDialog(this,"Chose piece to promote to:","Promotion",JOptionPane.DEFAULT_OPTION,JOptionPane.PLAIN_MESSAGE,null,options,options[0]);
+        if(response == 1) return 'R';
+        if(response == 2) return 'B';
+        if(response == 3) return 'N';
+        return 'Q';
     }
 }
