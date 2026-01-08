@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.util.Iterator;
 
 public class GUIBoard extends JPanel implements ActionListener {
+    JButton[][] buttons_copy = new JButton[8][8];
     JButton[][] buttons = new JButton[8][8];
     Colors crtColor = Colors.WHITE;
     ImageIcon whiteTile, blackTile;
@@ -31,13 +32,13 @@ public class GUIBoard extends JPanel implements ActionListener {
     }
 
     private void resetColor(){
-        for (int i = 0; i < buttons.length; i++) {
+        for (int i = 0; i < buttons_copy.length; i++) {
             if(i % 2 == 0)
                 crtColor = Colors.WHITE;
             else
                 crtColor = Colors.BLACK;
-            for (int j = 0; j < buttons[i].length; j++) {
-                setColor(buttons[i][j]);
+            for (int j = 0; j < buttons_copy[i].length; j++) {
+                setColor(buttons_copy[i][j]);
             }
         }
     }
@@ -52,17 +53,16 @@ public class GUIBoard extends JPanel implements ActionListener {
     public GUIBoard(boolean isInteractable, int size) {
         setLayout(new GridLayout(8, 8,0,0));
         setSize(size);
-        for (int i = 0; i < buttons.length; i++) {
+        for (int i = 0; i < buttons_copy.length; i++) {
             if(i % 2 == 0)
                 crtColor = Colors.WHITE;
             else
                 crtColor = Colors.BLACK;
-            for (int j = 0; j < buttons[i].length; j++) {
-                buttons[i][j] = new JButton();
-                buttons[i][j].setEnabled(isInteractable);
-                buttons[i][j].addActionListener(this);
-                setColor(buttons[i][j]);
-                this.add(buttons[i][j]);
+            for (int j = 0; j < buttons_copy[i].length; j++) {
+                buttons_copy[i][j] = new JButton();
+                buttons_copy[i][j].setEnabled(isInteractable);
+                buttons_copy[i][j].addActionListener(this);
+                setColor(buttons_copy[i][j]);
             }
         }
     }
@@ -70,20 +70,38 @@ public class GUIBoard extends JPanel implements ActionListener {
     public void updateContent(Game game){
         this.board = game.getBoard();
         this.game = game;
+
+        removeAll();
+
+        if(game.getHumanPlayer().color == Colors.WHITE) {
+            JButton[][] flippedButtons = new JButton[8][8];
+            for (int i = 0; i < 8; i++) {
+                flippedButtons[i] = buttons_copy[7 - i];
+            }
+            buttons = flippedButtons;
+        } else {
+            buttons = buttons_copy;
+        }
+        for (int i = 0; i < buttons_copy.length; i++) {
+            for (int j = 0; j < buttons_copy[i].length; j++) {
+                this.add(buttons[i][j]);
+            }
+        }
+
         game.checkEndOfGame();
         Iterator<ChessPair<Position, Piece>> iterator = board.pieces.iterator();
         ChessPair<Position, Piece> chessPair;
         Position pos;
         for(int i = 0; i < 8; i++){
             for (int j = 0; j < 8; j++){
-                buttons[i][j].setIcon(null);
+                buttons_copy[i][j].setIcon(null);
             }
         }
         while (iterator.hasNext()) {
             chessPair = iterator.next();
             pos = chessPair.getKey();
-            buttons[pos.y - 1][(int) (pos.x - 'A')].setIcon(PieceImageFactory.factory(chessPair.getValue()));
-            buttons[pos.y - 1][(int) (pos.x - 'A')].setDisabledIcon(PieceImageFactory.factory(chessPair.getValue()));
+            buttons_copy[pos.y - 1][(int) (pos.x - 'A')].setIcon(PieceImageFactory.factory(chessPair.getValue()));
+            buttons_copy[pos.y - 1][(int) (pos.x - 'A')].setDisabledIcon(PieceImageFactory.factory(chessPair.getValue()));
         }
     }
 
@@ -93,10 +111,10 @@ public class GUIBoard extends JPanel implements ActionListener {
         resetColor();
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (buttons[i][j].equals(e.getSource())) {
+                if (buttons_copy[i][j].equals(e.getSource())) {
                     x = j;
                     y = i;
-                    buttons[i][j].setBackground(Color.GREEN);
+                    buttons_copy[i][j].setBackground(Color.GREEN);
                 }
             }
         }
@@ -112,7 +130,7 @@ public class GUIBoard extends JPanel implements ActionListener {
                 }
 
                 for (Position pos : positions) {
-                    buttons[pos.y - 1][(int) (pos.x - 'A')].setBackground(Color.GREEN);
+                    buttons_copy[pos.y - 1][(int) (pos.x - 'A')].setBackground(Color.GREEN);
                 }
             } catch (Exception ex) {
             }
