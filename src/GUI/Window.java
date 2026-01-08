@@ -21,7 +21,7 @@ public class Window extends JFrame implements ActionListener, GUIObserver {
 
     public Window(String title) {
         super(title);
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(1600,1024));
         setPreferredSize(new Dimension(1600,1024));
         cardLayout = new CardLayout();
@@ -38,24 +38,24 @@ public class Window extends JFrame implements ActionListener, GUIObserver {
         gamePanel.addObserver(this);
 
         winPanel = new WinPanel();
+        winPanel.addObserver(this);
 
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                try {
-                    Main.getInstance().write();
-                } catch (Exception ex) {
-                    System.out.println("Something went wrong while saving, no progress saved.");
-                }
-                dispose();
-            }
-        });
+//        addWindowListener(new WindowAdapter() {
+//            @Override
+//            public void windowClosing(WindowEvent e) {
+//                try {
+//                    Main.getInstance().write();
+//                } catch (Exception ex) {
+//                    System.out.println("Something went wrong while saving, no progress saved.");
+//                }
+//                dispose();
+//            }
+//        });
 
         add("Login", loginPanel);
         add("Menu", menuPanel);
         add("Game", gamePanel);
         add("Win", winPanel);
-        pack();
         setVisible(true);
     }
 
@@ -88,10 +88,25 @@ public class Window extends JFrame implements ActionListener, GUIObserver {
                 gamePanel.updateContent();
                 pack();
                 break;
+            case 3:
+                gamePanel.setColor();
+                break;
+            case 4:
+                gamePanel.setPoints();
+                gamePanel.setCapturedPieces();
+                break;
+            case 5:
+                gamePanel.setHistory();
+                gamePanel.checkCheck();
+                break;
             default:
                 break;
         }
         repaint();
+    }
+
+    public char changePiece(){
+        return gamePanel.changePiece();
     }
 
     public void setGame(Game game){

@@ -51,6 +51,10 @@ public class Player {
         this.pieces = pieces;
     }
 
+    public void addCapturedPiece(Piece p){
+        capturedPieces.add(p);
+    }
+
     public List<Piece> getCapturedPieces() {
         return capturedPieces;
     }
@@ -62,14 +66,10 @@ public class Player {
         return points;
     }
     public void setPoints(int points) {
-        if(points < 0)
-            points = 0;
         this.points = points;
     }
     public void addPoints(int points){
         this.points += points;
-        if(this.points < 0)
-            this.points = 0;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package Board;
 
+import Base.Main;
 import Exceptions.InvalidCommandException;
 import Exceptions.InvalidMoveException;
 import Pieces.*;
@@ -143,18 +144,7 @@ public class Board {
             if (piece.getColor() == Colors.WHITE && to.y == 8 || piece.getColor() == Colors.BLACK && to.y == 1) {
                 String newPiece = "";
                 if(player) {
-                    while(true) {
-                        try {
-                            System.out.println("Chose piece to change pawn into:");
-                            Scanner in = new Scanner(System.in);
-                            newPiece = in.nextLine().toUpperCase();
-                            if (newPiece.length() > 2)
-                                throw new InvalidMoveException("Invalid piece: " + newPiece);
-                            break;
-                        } catch (Exception e){
-                            System.out.print("Invalid piece. Try again. ");
-                        }
-                    }
+                    newPiece = String.valueOf(Main.getInstance().ui.changePiece());
                 }else{
                     newPiece = String.valueOf("QNBR".charAt(new Random().nextInt(4)));
                     System.out.println("Computer chose to change P into " + newPiece);

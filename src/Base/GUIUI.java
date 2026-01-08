@@ -10,9 +10,7 @@ import javax.security.auth.login.LoginException;
 public class GUIUI implements UIElement {
     private static GUIUI instance = null;
     Window window;
-
-    private GUIUI() {
-    }
+    private GUIUI() {}
 
 
     public static GUIUI getInstance() {
@@ -29,25 +27,30 @@ public class GUIUI implements UIElement {
 
     @Override
     public void runGame(Game game) {
-        game.init();
         window.setGame(game);
         window.updatePage(2);
+    }
+
+    @Override
+    public char changePiece() {
+        return window.changePiece();
     }
 
 
     @Override
     public void onMoveMade(Move move) {
-
+        window.updatePage(5);
     }
 
     @Override
     public void onPieceCaptured(Piece piece) {
-
+        window.updatePage(4);
     }
 
     @Override
     public void onPlayerSwitch(Player currentPlayer) {
-
+        System.out.println("Player switched to: " + currentPlayer.name + " " + currentPlayer.color);
+        window.updatePage(3);
     }
 
     @Override
@@ -56,6 +59,9 @@ public class GUIUI implements UIElement {
         Main.getInstance().currentUser.setPoints(points);
         Main.getInstance().currentUser.removeGame(game);
         Main.getInstance().games.remove(game.getId(), game);
+        try {
+            Main.getInstance().write();
+        }catch (Exception ignored){}
         window.showWinPage(result,game);
     }
 }

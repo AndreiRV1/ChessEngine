@@ -21,12 +21,13 @@ public class LoadGamePanel extends JPanel implements ActionListener {
     JLabel player1, player2;
     JScrollPane scroll;
     JTextArea history;
-    PaperButton load;
+    PaperButton load,delete;
     Game game;
     GUIBoard GUIBoard;
 
     LoadGamePanel(){
         super();
+        setOpaque(false);
         GroupLayout layout = new GroupLayout(this);
         setLayout(layout);
 
@@ -56,6 +57,7 @@ public class LoadGamePanel extends JPanel implements ActionListener {
         scroll.getVerticalScrollBar().setBackground(new Color(245, 245, 242));
 
         load  = new PaperButton("Load");
+        delete = new PaperButton("Delete");
         player1 = new JLabel("Player 1");
         player1.setFont(new Font("Serif", Font.ITALIC, 16));
         player1.setForeground(new Color(40, 35, 30));
@@ -69,6 +71,7 @@ public class LoadGamePanel extends JPanel implements ActionListener {
 
         games.addActionListener(this);
         load.addActionListener(this);
+        delete.addActionListener(this);
         games.setPreferredSize(new Dimension(50,25));
         games.setMaximumSize(games.getPreferredSize());
 
@@ -90,7 +93,9 @@ public class LoadGamePanel extends JPanel implements ActionListener {
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(scroll)
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(load)
+                .addGroup(layout.createParallelGroup()
+                        .addComponent(load)
+                        .addComponent(delete))
                 .addGap(100)
         );
         layout.setHorizontalGroup(layout.createSequentialGroup()
@@ -102,12 +107,15 @@ public class LoadGamePanel extends JPanel implements ActionListener {
                         .addComponent(player2)
                         .addComponent(GUIBoard)
                         .addComponent(scroll)
-                        .addComponent(load))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(load)
+                                .addComponent(delete)))
                 .addGap(100)
         );
     }
 
     public void updateContent(){
+        Main.getInstance().readGames();
         User currentUser = Main.getInstance().getCurrentUser();
         games.removeAllItems();
         for(Game g:currentUser.getActiveGames()){
@@ -137,6 +145,15 @@ public class LoadGamePanel extends JPanel implements ActionListener {
         }
         if(e.getSource() == load){
             Main.getInstance().loadGame(game);
+        }
+        if(e.getSource() == delete){
+            User currentUser = Main.getInstance().getCurrentUser();
+            currentUser.removeGame(game);
+            Main.getInstance().removeGame(game);
+            try {
+                Main.getInstance().write();
+            } catch (Exception ignored){}
+            updateContent();
         }
     }
 }

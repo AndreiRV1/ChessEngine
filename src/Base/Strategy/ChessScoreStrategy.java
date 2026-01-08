@@ -20,7 +20,7 @@ public class ChessScoreStrategy implements ScoreStrategy {
 
     @Override
     public int getScoreForWin() {
-        return 300; // Example bonus for winning
+        return 300;
     }
 
     @Override
@@ -30,11 +30,11 @@ public class ChessScoreStrategy implements ScoreStrategy {
 
     @Override
     public int getScoreForDraw() {
-        return 150; // Example points for a draw
+        return 150;
     }
 
     @Override
     public int getScoreForResign() {
-        return -150; // Example points for a draw
+        return -150;
     }
 }

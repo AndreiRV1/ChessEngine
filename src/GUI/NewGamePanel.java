@@ -5,6 +5,7 @@ import Base.Main;
 import Base.Player;
 import Base.User;
 import Pieces.Colors;
+import Pieces.Queen;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -20,8 +21,10 @@ public class NewGamePanel extends JPanel implements ActionListener {
     TextField nickname;
     RadioButton black, white;
     PaperButton startGame;
+
     NewGamePanel(){
         super();
+        setOpaque(false);
         setBorder(new EmptyBorder(100,100,100,50));
         title = new JLabel("New Game");
 

@@ -24,24 +24,21 @@ public class MenuPanel extends JPanel implements ActionListener, GUISubject {
     JPanel context;
     ImageIcon leftPage = new ImageIcon("Images/left.png");
     ImageIcon rightPage = new ImageIcon("Images/right.png");
+    ImageIcon book = new ImageIcon("Images/full.png");
 
+
+    @Override
+    public void paintComponent(Graphics g){
+        super.paintComponent(g);
+        g.drawImage(book.getImage(),0,0,getWidth(),getHeight(),this);
+    }
 
     public MenuPanel() {
         setLayout(new GridLayout(1,2));
-        JPanel menu = new JPanel(){
-            @Override
-            public void paintComponent(Graphics g){
-                super.paintComponent(g);
-                g.drawImage(rightPage.getImage(),0,0,getWidth(),getHeight(),this);
-            }
-        };
-        context = new JPanel(){
-            @Override
-            public void paintComponent(Graphics g){
-                super.paintComponent(g);
-                g.drawImage(leftPage.getImage(),0,0,getWidth(),getHeight(),this);
-            }
-        };
+        JPanel menu = new JPanel();
+        context = new JPanel();
+        context.setOpaque(false);
+        menu.setOpaque(false);
 
         menu.setBorder(new EmptyBorder(0,0,0,50));
         title = new JLabel("The Menu");
@@ -110,20 +107,8 @@ public class MenuPanel extends JPanel implements ActionListener, GUISubject {
         newGame.addActionListener(this);
         loadGame.addActionListener(this);
 
-        newGamePanel = new NewGamePanel(){
-            @Override
-            public void paintComponent(Graphics g){
-                super.paintComponent(g);
-                g.drawImage(leftPage.getImage(),0,0,getWidth(),getHeight(),this);
-            }
-        };
-        loadGamePanel = new LoadGamePanel(){
-            @Override
-            public void paintComponent(Graphics g){
-                super.paintComponent(g);
-                g.drawImage(leftPage.getImage(),0,0,getWidth(),getHeight(),this);
-            }
-        };
+        newGamePanel = new NewGamePanel();
+        loadGamePanel = new LoadGamePanel();
 
         add(context);
         add(menu);

@@ -14,7 +14,7 @@ public class Main{
     List<User> users;
     Map<Long, Game> games;
     User currentUser;
-    static UIElement ui;
+    public static UIElement ui;
     private static Main instance = null;
 
     private Main() {
@@ -34,14 +34,47 @@ public class Main{
         return instance;
     }
 
+    public void saveAccounts(){
+        System.out.println("Saving accounts...");
+        try {
+            JsonReaderUtil.writeAccounts(Paths.get("input/accounts.json"), users);
+        }catch (Exception e){
+            System.out.println("No accounts saved. Something went wrong.");
+        }
+    }
+
+    public void saveGames(){
+        System.out.println("Saving games...");
+        try {
+            JsonReaderUtil.writeGames(Paths.get("input/games.json"), games);
+        }catch (Exception e){
+            System.out.println("No games saved. Something went wrong.");
+        }
+    }
+
+    public void readGames(){
+        System.out.println("Reading Games...");
+        try {
+            games = JsonReaderUtil.readGamesAsMap(Paths.get("input/games.json"));
+        }catch (Exception e){
+            System.out.println("No games read. Something went wrong.");
+        }
+    }
+
     public void read() throws IOException, ParseException {
+        System.out.println("Reading...");
         games = JsonReaderUtil.readGamesAsMap(Paths.get("input/games.json"));
         users = JsonReaderUtil.readAccounts(Paths.get("input/accounts.json"), games);
     }
 
     public void write() throws IOException, ParseException {
+        System.out.println("Writing...");
         JsonReaderUtil.writeGames(Paths.get("input/games.json"), games);
         JsonReaderUtil.writeAccounts(Paths.get("input/accounts.json"), users);
+    }
+
+    public void removeGame(Game game){
+        games.remove(game.getId());
     }
 
     public User login(String email, String password) throws InvalidLoginCredentials, NotFoundException {
@@ -68,16 +101,17 @@ public class Main{
         User user = new User(email, password);
         users.add(user);
         currentUser = user;
+        saveAccounts();
         return user;
     }
 
     public void createGame(Game newGame) {
         games.put(newGame.getId(), newGame);
         currentUser.addGame(newGame);
-            System.out.println("Creating game");
-            newGame.addObserver(ui);
-            newGame.start();
-            ui.runGame(newGame);
+        System.out.println("Creating game");
+        newGame.addObserver(ui);
+        newGame.start();
+        ui.runGame(newGame);
     }
 
     public void loadGame(Game selectedGame){

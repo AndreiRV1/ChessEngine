@@ -58,12 +58,22 @@ public class Game implements GameSubject {
         }
     }
 
+    public Player getCurrentPlayer(){
+        return players.get(crtPlayer);
+    }
+
     public Player getPlayer(Colors color){
         for(Player player : players){
             if(player.color == color)
                 return player;
         }
         return null;
+    }
+
+    public void resign(){
+        getHumanPlayer().addPoints(scoreStrategy.getScoreForResign());
+        System.out.println(getHumanPlayer().getPoints());
+        notifyObservers(EventType.GAME_END.ordinal(), GameState.RESIGN);
     }
 
     public Player getHumanPlayer(){
@@ -83,6 +93,7 @@ public class Game implements GameSubject {
         for (Move m : moveHistory.keySet()) {
             if(m.getCapturedPiece() != null && !loaded){
                 getPlayer(m.getColor()).addPoints(scoreStrategy.getScoreForCapture(m.getCapturedPiece()));
+                getPlayer(m.getColor()).addCapturedPiece(m.getCapturedPiece());
             }
             if(i == 1){
                 lastMove = m.getColor();
@@ -95,6 +106,7 @@ public class Game implements GameSubject {
         }
         crtPlayer = (lastMove == players.getFirst().color)?0:1;
         switchPlayer();
+        checkEndOfGame();
     }
 
     public void checkEndOfGame(){
@@ -138,8 +150,11 @@ public class Game implements GameSubject {
     public void makeMove(Position oldPosition, Position newPosition){
         Player currentPlayer = players.get(crtPlayer);
         ChessPair<String,Piece> output = currentPlayer.makeMove(oldPosition,newPosition,board);
+        notifyObservers(EventType.MOVE_MADE.ordinal(), new Move(currentPlayer.color, oldPosition, newPosition, output.getValue(),output.getKey()));
         currentPlayer.addPoints(scoreStrategy.getScoreForCapture(output.getValue()));
+        currentPlayer.addCapturedPiece(output.getValue());
         addMove(currentPlayer,oldPosition,newPosition,output.getValue(),output.getKey());
+        checkEndOfGame();
         switchPlayer();
     }
 
@@ -266,7 +281,6 @@ public class Game implements GameSubject {
 
     public void addMove(Player p, Position from, Position to,Piece capturedPiece,String specialMove) {
         Move move = new Move(p.color, from, to, capturedPiece,specialMove);
-        notifyObservers(EventType.MOVE_MADE.ordinal(), move);
         if(capturedPiece != null)
             notifyObservers(EventType.PIECE_CAPTURED.ordinal(), capturedPiece);
         moveHistory.put(move, p);

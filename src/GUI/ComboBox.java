@@ -32,7 +32,6 @@ public class ComboBox<E> extends JComboBox<E> {
             }
         });
 
-        // 3. Remove the default "Arrow" look
         setUI(new javax.swing.plaf.basic.BasicComboBoxUI() {
             @Override
             protected JButton createArrowButton() {

@@ -4,6 +4,7 @@ import Base.Observers.GameObserver;
 import Board.Move;
 import Exceptions.InvalidCommandException;
 import Exceptions.InvalidLoginCredentials;
+import Exceptions.InvalidMoveException;
 import Exceptions.NotFoundException;
 import Pieces.Colors;
 import Pieces.Piece;
@@ -211,6 +212,24 @@ public class CLIUI implements UIElement {
     }
 
     @Override
+    public char changePiece() {
+        String newPiece;
+        while(true) {
+            try {
+                System.out.println("Chose piece to change pawn into:");
+                Scanner in = new Scanner(System.in);
+                newPiece = in.nextLine().toUpperCase();
+                if (newPiece.length() > 2)
+                    throw new InvalidMoveException("Invalid piece: " + newPiece);
+                break;
+            } catch (Exception e){
+                System.out.print("Invalid piece. Try again. ");
+            }
+        }
+        return newPiece.charAt(0);
+    }
+
+    @Override
     public void onMoveMade(Move move) {
         System.out.println("Move made: "+ move.getLastPosition()+"-"+move.getNextPosition());
     }
@@ -245,4 +264,5 @@ public class CLIUI implements UIElement {
             System.out.println("You LOST");
         }
     }
+
 }

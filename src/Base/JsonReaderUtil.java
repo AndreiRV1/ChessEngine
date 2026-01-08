@@ -213,6 +213,7 @@ public final class JsonReaderUtil {
                         moves.add(new Move(Colors.valueOf(playerColor), new Position(from), new Position(to), capturedPiece,specialMove));
                     }
                     g.setMoves(moves);
+                    g.init();
                 }
                 map.put(id, g);
             }

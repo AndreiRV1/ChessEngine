@@ -34,6 +34,8 @@ public class User {
 
     public void setPoints(int points) {
         this.points = points;
+        if(this.points < 0)
+            this.points = 0;
     }
 
     public String getEmail() {

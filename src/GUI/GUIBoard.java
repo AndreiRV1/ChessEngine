@@ -70,6 +70,7 @@ public class GUIBoard extends JPanel implements ActionListener {
     public void updateContent(Game game){
         this.board = game.getBoard();
         this.game = game;
+        game.checkEndOfGame();
         Iterator<ChessPair<Position, Piece>> iterator = board.pieces.iterator();
         ChessPair<Position, Piece> chessPair;
         Position pos;
