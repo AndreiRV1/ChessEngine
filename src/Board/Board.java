@@ -68,7 +68,7 @@ public class Board {
         pieces.add(createPiece("R", "black", "H8"));
 
         blackKing = new Position('E', 8);
-        whiteKing = new Position('D', 1);
+        whiteKing = new Position('E', 1);
     }
 
     public void addPiece(Piece piece) {
@@ -135,6 +135,13 @@ public class Board {
 
         piece.setPosition(to);
         piece.hasMoved = true;
+        if (piece.type() == 'K') {
+            if (piece.getColor() == Colors.WHITE) {
+                whiteKing = to;
+            } else {
+                blackKing = to;
+            }
+        }
         ChessPair<Position, Piece> chessPair = new ChessPair(from, piece);
         pieces.remove(chessPair);
         chessPair.setKey(to);

@@ -115,7 +115,7 @@ public class LoadGamePanel extends JPanel implements ActionListener {
     }
 
     public void updateContent(){
-        Main.getInstance().readGames();
+        Main.getInstance().discardChanges();
         User currentUser = Main.getInstance().getCurrentUser();
         games.removeAllItems();
         for(Game g:currentUser.getActiveGames()){

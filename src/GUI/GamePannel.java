@@ -241,7 +241,9 @@ public class GamePannel extends JPanel implements ActionListener, GUISubject {
         st.append("Black pieces taken: ");
         try {
             for (Piece p : game.getPlayer(Colors.WHITE).getCapturedPieces()) {
-                st.append(PieceFactory.pieceUnicode(p.type())).append(" ");
+                if (p != null) {
+                    st.append(PieceFactory.pieceUnicode(p.type())).append(" ");
+                }
             }
         }catch (Exception ignored){}
         st.append(" .");
@@ -252,7 +254,9 @@ public class GamePannel extends JPanel implements ActionListener, GUISubject {
         st.append("White pieces taken: ");
         try {
             for (Piece p : game.getPlayer(Colors.BLACK).getCapturedPieces()) {
-                st.append(PieceFactory.pieceUnicode(p.type())).append(" ");
+                if (p != null) {
+                    st.append(PieceFactory.pieceUnicode(p.type())).append(" ");
+                }
             }
         }catch (Exception ignored){}
         st.append(" .");
@@ -292,6 +296,7 @@ public class GamePannel extends JPanel implements ActionListener, GUISubject {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == menuButton){
+            Main.getInstance().discardChanges();
             notifyObservers(1);
         }
         if(e.getSource() == exitButton){

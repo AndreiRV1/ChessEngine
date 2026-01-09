@@ -52,17 +52,11 @@ public class Main{
         }
     }
 
-    public void readGames(){
-        System.out.println("Reading Games...");
-        try {
-            games = JsonReaderUtil.readGamesAsMap(Paths.get("input/games.json"));
-        }catch (Exception e){
-            System.out.println("No games read. Something went wrong.");
-        }
-    }
 
     public void read() throws IOException, ParseException {
         System.out.println("Reading...");
+        games = null;
+        users = null;
         games = JsonReaderUtil.readGamesAsMap(Paths.get("input/games.json"));
         users = JsonReaderUtil.readAccounts(Paths.get("input/accounts.json"), games);
     }
@@ -120,6 +114,23 @@ public class Main{
             ui.runGame(selectedGame);
     }
 
+    public void discardChanges() {
+        String currentEmail = (currentUser != null) ? currentUser.getEmail() : null;
+        try {
+            read();
+            if (currentEmail != null) {
+                for (User user : users) {
+                    if (user.getEmail().equals(currentEmail)) {
+                        currentUser = user;
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error discarding changes: " + e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
 
         Main app = getInstance();
@@ -148,12 +159,9 @@ public class Main{
             System.out.println(e.getMessage());
             e.printStackTrace();
             System.out.println("Something went wrong.");
-        }finally{
-            try {
-                app.write();
-            }catch (Exception e){
-                System.out.println("Something went wrong while saving, no progress saved.");
-            }
+        } finally {
+            Main.getInstance().saveAccounts();
+            Main.getInstance().saveGames();
         }
     }
 }

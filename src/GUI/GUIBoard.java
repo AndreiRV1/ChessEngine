@@ -118,7 +118,7 @@ public class GUIBoard extends JPanel implements ActionListener {
                 }
             }
         }
-        if(selected == null) {
+        if (selected == null) {
             System.out.println(new Position((char) (x + 'A'), y + 1).toString());
             try {
                 Piece piece = board.getPieceAt(new Position((char) (x + 'A'), y + 1));
@@ -134,15 +134,19 @@ public class GUIBoard extends JPanel implements ActionListener {
                 }
             } catch (Exception ex) {
             }
-        } else{
-            if(positions.contains(new Position((char) (x + 'A'), y + 1))){
-                game.makeMove(selected,new Position((char) (x + 'A'), y + 1));
-                updateContent(game);
-                ChessPair<Position,Position> computerChoice = game.choseComputerMove();
-                game.makeMove(computerChoice.getKey(), computerChoice.getValue());
+        } else {
+            if (positions.contains(new Position((char) (x + 'A'), y + 1))) {
+                game.makeMove(selected, new Position((char) (x + 'A'), y + 1));
                 updateContent(game);
                 selected = null;
-            }else{
+                if (game.isInMate == null && !game.getCurrentPlayer().equals(game.getHumanPlayer())) {
+                    ChessPair<Position, Position> computerChoice = game.choseComputerMove();
+                    if (computerChoice.getKey() != null && computerChoice.getValue() != null) {
+                        game.makeMove(computerChoice.getKey(), computerChoice.getValue());
+                        updateContent(game);
+                    }
+                }
+            } else {
                 resetColor();
                 selected = null;
             }

@@ -123,16 +123,23 @@ public class Game implements GameSubject {
         for(ChessPair<Position,Piece> p : board.getPieces(Colors.BLACK)){
             if(p.getValue().checkForCheck(board,board.whiteKing)){
                 isInCheck = Colors.WHITE;
+                break;
             }
         }
 
         if(checkForMate()){
-            if(getHumanPlayer().color == isInMate){
-                getHumanPlayer().addPoints(scoreStrategy.getScoreForLoss());
-                notifyObservers(EventType.GAME_END.ordinal(), GameState.LOSE);
-            }else{
-                currentPlayer.addPoints(scoreStrategy.getScoreForWin());
-                notifyObservers(EventType.GAME_END.ordinal(), GameState.WIN);
+            if(isInCheck != null && isInCheck == isInMate) {
+                if (getHumanPlayer().color == isInMate) {
+                    getHumanPlayer().addPoints(scoreStrategy.getScoreForLoss());
+                    notifyObservers(EventType.GAME_END.ordinal(), GameState.LOSE);
+                } else {
+                    Player winner = getPlayer(isInMate == Colors.WHITE ? Colors.BLACK : Colors.WHITE);
+                    if (winner != null) winner.addPoints(scoreStrategy.getScoreForWin());
+                    notifyObservers(EventType.GAME_END.ordinal(), GameState.WIN);
+                }
+            } else {
+                getHumanPlayer().addPoints(scoreStrategy.getScoreForDraw());
+                notifyObservers(EventType.GAME_END.ordinal(), GameState.DRAW);
             }
         }
         if(moveHistory.size() >= 6 && currentPlayer.name.equals("computer")) {
@@ -151,13 +158,14 @@ public class Game implements GameSubject {
     public void makeMove(Position oldPosition, Position newPosition){
         Player currentPlayer = players.get(crtPlayer);
         ChessPair<String,Piece> output = currentPlayer.makeMove(oldPosition,newPosition,board);
+        currentPlayer.addPoints(scoreStrategy.getScoreForCapture(output.getValue()));
+        if (output.getValue() != null) {
+            currentPlayer.addCapturedPiece(output.getValue());
+        }
+        addMove(currentPlayer,oldPosition,newPosition,output.getValue(),output.getKey());
+        switchPlayer();
         checkEndOfGame();
         notifyObservers(EventType.MOVE_MADE.ordinal(), new Move(currentPlayer.color, oldPosition, newPosition, output.getValue(),output.getKey()));
-        currentPlayer.addPoints(scoreStrategy.getScoreForCapture(output.getValue()));
-        currentPlayer.addCapturedPiece(output.getValue());
-        addMove(currentPlayer,oldPosition,newPosition,output.getValue(),output.getKey());
-        checkEndOfGame();
-        switchPlayer();
     }
 
     public ChessPair<Position,Position> choseComputerMove(){
@@ -256,26 +264,16 @@ public class Game implements GameSubject {
     public boolean checkForMate() {
         if(isInMate != null)
             return true;
+        Colors color = players.get(crtPlayer).color;
         boolean hasMoreMoves = false;
-        for(ChessPair<Position,Piece> p : board.getPieces(Colors.WHITE)){
+        for(ChessPair<Position,Piece> p : board.getPieces(color)){
             if(!p.getValue().getPossibleMoves(board).isEmpty()) {
                 hasMoreMoves = true;
                 break;
             }
         }
         if(!hasMoreMoves){
-            isInMate = Colors.WHITE;
-            return true;
-        }
-        hasMoreMoves = false;
-        for(ChessPair<Position,Piece> p : board.getPieces(Colors.BLACK)){
-            if(!p.getValue().getPossibleMoves(board).isEmpty()) {
-                hasMoreMoves = true;
-                break;
-            }
-        }
-        if(!hasMoreMoves){
-            isInMate = Colors.BLACK;
+            isInMate = color;
             return true;
         }
         return false;
