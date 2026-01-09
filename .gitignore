@@ -1,0 +1,15 @@
+# Compiled class files
+out/
+*.class
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Save files and temporary data
+save.game
+input/*.json.bak
+
+# OS specific files
+.DS_Store
+Thumbs.db
