@@ -1,5 +1,4 @@
 # Chess game
-## Radulescu Andrei-Valentin 321CC
 
 A comprehensive Java implementation of a Chess game, featuring a graphical user interface (Swing), persistent storage, 
 a basic AI opponent, and a robust login system.
